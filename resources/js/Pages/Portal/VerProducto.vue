@@ -27,7 +27,7 @@ const accion_compartir = ref(0);
 const url_catalogo = ref("");
 const compartirCatalogo = () => {
     muestra_compartir.value = true;
-    url_catalogo.value = route("portal.productos", props.catalogo.id);
+    url_catalogo.value = route("portal");
 };
 
 const oProducto = ref({});
@@ -53,9 +53,7 @@ onBeforeUnmount(() => {});
                     @cerrar-formulario="muestra_compartir = false"
                 ></Compartir>
                 <div class="mx-auto col-md-9 text-center mt-3" v-if="catalogo">
-                    <Link
-                        class="text-dark"
-                        :href="route('portal.productos', catalogo.id)"
+                    <Link class="text-dark" :href="route('portal')"
                         ><i class="fa fa-arrow-left"></i> Volver a
                         Catálogo</Link
                     >
@@ -78,26 +76,6 @@ onBeforeUnmount(() => {});
                             ><i class="fa fa-share-alt"></i
                         ></a>
                     </el-tooltip>
-                    <template v-if="catalogo.descargar == 1">
-                        <el-tooltip
-                            class="box-item"
-                            effect="dark"
-                            content="Descargar Catálogo"
-                            placement="bottom-start"
-                        >
-                            <a
-                                :href="
-                                    route(
-                                        'portal.descargar_catalogo',
-                                        catalogo.id,
-                                    )
-                                "
-                                target="_blank"
-                                class="text-dark"
-                                ><i class="fa fa-download"></i
-                            ></a>
-                        </el-tooltip>
-                    </template>
                     <el-tooltip
                         class="box-item"
                         effect="dark"
@@ -113,7 +91,7 @@ onBeforeUnmount(() => {});
                 <div class="menu_inicio">
                     <div class="contenedor_producto">
                         <div
-                            class="producto"
+                            class="w-100"
                             :style="{
                                 backgroundImage: `url(${producto.url_imagen})`,
                                 backgroundSize: 'contain',
@@ -121,10 +99,40 @@ onBeforeUnmount(() => {});
                                 backgroundPosition: 'center',
                             }"
                         ></div>
+                        <div class="nombre">{{ producto.nombre }}</div>
+                        <div
+                            class="desc"
+                            v-for="(
+                                item, index
+                            ) in producto.producto_descripcions"
+                            :class="[`descripcion${index > 0 ? index : ''}`]"
+                        >
+                            {{ item.descripcion }}
+                        </div>
+                        <div class="precio">
+                            {{ producto.moneda }} {{ producto.precio }}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </template>
-<style scoped></style>
+<style scoped>
+.contenedor_producto div {
+    min-height: 50vh;
+}
+.contenedor_producto .nombre,
+.contenedor_producto .precio,
+.contenedor_producto .desc {
+    width: 100%;
+    text-align: center;
+    min-height: auto;
+    height: auto;
+}
+
+.contenedor_producto .nombre,
+.contenedor_producto .precio {
+    font-weight: bold;
+}
+</style>

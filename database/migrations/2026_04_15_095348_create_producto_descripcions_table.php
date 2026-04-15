@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('producto_descripcions', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger("producto_id");
-            $table->text("decripcion")->nullable();
+            $table->text("descripcion")->nullable();
             $table->timestamps();
 
             $table->foreign("producto_id")->on("productos")->references("id");

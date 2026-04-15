@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->integer("pagina");
             $table->integer("descripcion");
-            $table->integer("imagenes");
             $table->integer("productos");
             $table->integer("redes")->default(0);
             $table->timestamps();

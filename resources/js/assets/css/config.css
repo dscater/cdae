@@ -98,6 +98,10 @@ td .descripcion {
     padding: 5px !important;
     background-color: var(--bg3) !important;
 }
+
+.breadcrumb-item + .breadcrumb-item::before {
+    color: white;
+}
 .content-wrapper .breadcrumb {
     padding: 5px;
     background-color: var(--bg3) !important;
@@ -305,12 +309,10 @@ body.fixedContentEstudiante.modal-open
 .menu_inicio {
     margin-top: 20px;
     width: 100%;
-    height: 79vh;
     display: flex;
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 1px 8px 10px rgba(0, 0, 0, 0.4);
-    max-height: 79vh;
 }
 .portada {
     width: 50%;
@@ -325,10 +327,14 @@ body.fixedContentEstudiante.modal-open
 
 .contenedor_producto {
     min-width: 100%;
+}
+
+.contenedor_producto .capa {
     cursor: grab;
     touch-action: pan-y;
     user-select: none;
 }
+
 .contenedor_producto:active {
     cursor: grabbing;
 }
@@ -336,6 +342,29 @@ body.fixedContentEstudiante.modal-open
 .menu_inicio .producto {
     height: 100%;
     display: block;
+    position: relative;
+}
+
+.producto .capa {
+    z-index: 1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+}
+
+.producto .capa div.accion button:hover {
+    background-color: white;
+}
+
+.menu_inicio .producto button,
+.menu_inicio .producto table td button,
+.menu_inicio .producto table td a,
+.menu_inicio .producto a {
+    position: relative;
+    z-index: 100;
 }
 
 .menu_inicio .producto img {
@@ -456,9 +485,33 @@ body.fixedContentEstudiante.modal-open
     color: #8b8b8b;
 }
 
+#pdf-container {
+    width: 210mm;
+}
+
+#pdf-container .pagina {
+    width: 210mm;
+    height: 297mm;
+
+    page-break-after: always; /*  salto de página */
+    break-after: page;
+    display: block;
+}
+
+#pdf-container .pagina:last-child {
+    page-break-after: auto;
+}
+
+#pdf-container .producto {
+    max-height: 297mm;
+}
+#pdf-container .pagina table {
+    height: 100%;
+}
+
 @media (max-width: 867px) {
     .menu_inicio {
-        height: 50vh;
+        /* height: 50vh; */
     }
 
     .portada {

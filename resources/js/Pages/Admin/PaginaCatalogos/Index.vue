@@ -26,24 +26,24 @@ const { axiosDelete } = useAxios();
 const miTable = ref(null);
 const headers = [
     {
-        label: "NRO.",
-        key: "id",
+        label: "NRO. PÁGINA",
+        key: "pagina",
         sortable: true,
         width: "4%",
     },
     {
-        label: "NOMBRE",
-        key: "nombre",
+        label: "NRO. DESCRIPCIÓN",
+        key: "descripcion",
         sortable: true,
     },
     {
-        label: "IMAGEN BOTÓN",
-        key: "imagen",
+        label: "NRO. PRODUCTOS",
+        key: "productos",
         sortable: true,
     },
     {
-        label: "DESCARGA",
-        key: "descargar",
+        label: "REDES SOCIALES",
+        key: "redes",
         sortable: true,
     },
     {
@@ -74,38 +74,14 @@ const updateDatatable = async () => {
         muestra_formulario.value = false;
     }
 };
-
-const eliminarPaginaCatalogo = (item) => {
-    Swal.fire({
-        title: "¿Quierés eliminar este registro?",
-        html: `<strong>${item.nombre}</strong>`,
-        showCancelButton: true,
-        confirmButtonText: "Si, eliminar",
-        cancelButtonText: "No, cancelar",
-        denyButtonText: `No, cancelar`,
-        customClass: {
-            confirmButton: "btn-danger",
-        },
-    }).then(async (result) => {
-        /* Read more about isConfirmed, isDenied below */
-        if (result.isConfirmed) {
-            let respuesta = await axiosDelete(
-                route("pagina_catalogos.destroy", item.id),
-            );
-            if (respuesta && respuesta.sw) {
-                updateDatatable();
-            }
-        }
-    });
-};
 </script>
 <template>
-    <Head title="Catálogos"></Head>
+    <Head title="Página de Catálogos"></Head>
     <Content>
         <template #header>
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">Catálogos</h1>
+                    <h1 class="m-0">Página de Catálogos</h1>
                 </div>
                 <!-- /.col -->
                 <div class="col-sm-6">
@@ -113,7 +89,9 @@ const eliminarPaginaCatalogo = (item) => {
                         <li class="breadcrumb-item">
                             <Link :href="route('inicio')">Inicio</Link>
                         </li>
-                        <li class="breadcrumb-item active">Catálogos</li>
+                        <li class="breadcrumb-item active">
+                            Página de Catálogos
+                        </li>
                     </ol>
                 </div>
                 <!-- /.col -->
@@ -123,21 +101,7 @@ const eliminarPaginaCatalogo = (item) => {
         <div class="row">
             <div class="col-md-12">
                 <div class="row">
-                    <div class="col-md-4">
-                        <button
-                            v-if="
-                                props_page.auth?.user.permisos == '*' ||
-                                props_page.auth?.user.permisos.includes(
-                                    'pagina_catalogos.create',
-                                )
-                            "
-                            type="button"
-                            class="btn btn-success"
-                            @click="agregarRegistro"
-                        >
-                            <i class="fa fa-plus"></i> Nuevo Catálogo
-                        </button>
-                    </div>
+                    <div class="col-md-4"></div>
                     <div class="col-md-8 my-1">
                         <div class="row justify-content-end">
                             <div class="col-md-5">
@@ -172,6 +136,7 @@ const eliminarPaginaCatalogo = (item) => {
                             :api="true"
                             :url="route('pagina_catalogos.paginado')"
                             :numPages="5"
+                            :per-page="10"
                             :multiSearch="multiSearch"
                             :syncOrderBy="'id'"
                             :syncOrderAsc="'DESC'"
@@ -179,30 +144,16 @@ const eliminarPaginaCatalogo = (item) => {
                             :header-class="'bg__primary'"
                             fixed-header
                         >
-                            <template #imagen="{ item }">
-                                <img
-                                    :src="item.url_imagen"
-                                    width="190px"
-                                    v-if="item.tipo == 'imagen'"
-                                />
-                                <span v-else
-                                    ><i class="fa-3x" :class="item.imagen"></i
-                                ></span>
-                            </template>
-                            <template #descargar="{ item }">
+                            <template #redes="{ item }">
                                 <span
                                     class="text-md"
                                     :class="
-                                        item.descargar
+                                        item.redes
                                             ? 'badge bg-success'
-                                            : 'badge bg-danger'
+                                            : 'badge bg-gray'
                                     "
                                 >
-                                    {{
-                                        item.descargar
-                                            ? "HABILITADO"
-                                            : "DESHABILITADO"
-                                    }}
+                                    {{ item.redes ? "SI" : "NO" }}
                                 </span>
                             </template>
                             <template #accion="{ item }">
@@ -217,44 +168,18 @@ const eliminarPaginaCatalogo = (item) => {
                                     <el-tooltip
                                         class="box-item"
                                         effect="dark"
-                                        content="Editar"
+                                        content="Ver Estructura"
                                         placement="left-start"
                                     >
                                         <button
-                                            class="btn btn-warning"
+                                            class="btn btn-primary"
                                             @click="
                                                 setPaginaCatalogo(item);
                                                 accion_formulario = 1;
                                                 muestra_formulario = true;
                                             "
                                         >
-                                            <i class="fa fa-pen"></i></button
-                                    ></el-tooltip>
-                                </template>
-
-                                <template
-                                    v-if="
-                                        props_page.auth?.user.permisos == '*' ||
-                                        props_page.auth?.user.permisos.includes(
-                                            'pagina_catalogos.destroy',
-                                        )
-                                    "
-                                >
-                                    <el-tooltip
-                                        class="box-item"
-                                        effect="dark"
-                                        content="Eliminar"
-                                        placement="left-start"
-                                    >
-                                        <button
-                                            class="btn btn-danger"
-                                            @click="
-                                                eliminarPaginaCatalogo(item)
-                                            "
-                                        >
-                                            <i
-                                                class="fa fa-trash-alt"
-                                            ></i></button
+                                            <i class="fa fa-image"></i></button
                                     ></el-tooltip>
                                 </template>
                             </template>

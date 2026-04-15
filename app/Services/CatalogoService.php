@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Services\HistorialAccionService;
 use App\Models\Catalogo;
+use App\Models\Producto;
+use App\Models\ProductoDescripcion;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Exception;
@@ -35,7 +37,8 @@ class CatalogoService
      */
     public function listadoPaginado(int $length, int $page, string $search, array $columnsSerachLike = [], array $columnsFilter = [], array $columnsBetweenFilter = [], array $orderBy = []): LengthAwarePaginator
     {
-        $catalogos = Catalogo::select("catalogos.*");
+        $catalogos = Catalogo::select("catalogos.*")
+            ->with(["pagina_catalogo:id,pagina,productos"]);
 
         // Filtros exactos
         foreach ($columnsFilter as $key => $value) {
@@ -81,20 +84,34 @@ class CatalogoService
     public function crear(array $datos): Catalogo
     {
         $catalogo = Catalogo::create([
-            "nombre" => mb_strtoupper($datos["nombre"]),
-            "tipo" => $datos["tipo"],
-            "descargar" => $datos["descargar"]
+            "pagina_id" => $datos["pagina_id"],
+            "estado" => $datos["estado"],
         ]);
 
-        if ($datos["tipo"] == 'icono') {
-            $catalogo->imagen = $datos["imagen"];
-            $catalogo->save();
-        } else {
+        // productos
+        foreach ($datos["productos"] as $key => $item) {
+            $producto =  $catalogo->productos()->create([
+                "codigo" => $item["codigo"],
+                "nombre" => $item["nombre"],
+                "moneda" => $item["moneda"],
+                "precio" => $item["precio"],
+            ]);
 
-            // cargar imagen
-            if ($datos["imagen"] && !is_string($datos["imagen"])) {
-                $this->cargarFoto($catalogo, $datos["imagen"]);
+            foreach ($item["producto_descripcions"] as $descripcion) {
+                $producto->producto_descripcions()->create([
+                    "descripcion" => $descripcion["descripcion"]
+                ]);
             }
+
+            // cargar imagen producto
+            if ($item["imagen"] && !is_string($item["imagen"])) {
+                $this->cargarImagenProducto($producto, $item["imagen"], $key);
+            }
+        }
+
+        // cargar fondo imagen
+        if ($datos["imagen"] && !is_string($datos["imagen"])) {
+            $this->cargarFondo($catalogo, $datos["imagen"]);
         }
 
         // registrar accion
@@ -116,23 +133,71 @@ class CatalogoService
         $old_catalogo = clone $catalogo;
 
         $catalogo->update([
-            "nombre" => mb_strtoupper($datos["nombre"]),
-            "tipo" => $datos["tipo"],
-            "descargar" => $datos["descargar"]
+            "pagina_id" => $datos["pagina_id"],
+            "estado" => $datos["estado"],
         ]);
 
-        if ($datos["tipo"] == 'icono') {
-            $catalogo->imagen = $datos["imagen"];
-            $catalogo->save();
+        if ($old_catalogo->pagina_id != $catalogo->pagina_id) {
+            // SI SE CAMBIO DE PAGINA ELIMINAR Y REHACER TODOS LOS PRODUCTOS
+            foreach ($catalogo->productos as $item) {
+                \File::delete(public_path("imgs/productos/" . $this->item->imagen));
+                $item->producto_descripcions()->forceDelete();
+                $item->forceDelete();
+            }
+
+            // productos
+            foreach ($datos["productos"] as $key => $item) {
+                $producto =  $catalogo->productos()->create([
+                    "codigo" => $item["codigo"],
+                    "nombre" => $item["nombre"],
+                    "moneda" => $item["moneda"],
+                    "precio" => $item["precio"],
+                ]);
+
+                foreach ($item["producto_descripcions"] as $descripcion) {
+                    $producto->producto_descripcions()->create([
+                        "descripcion" => $descripcion["descripcion"]
+                    ]);
+                }
+
+                // cargar imagen producto
+                if ($item["imagen"] && !is_string($item["imagen"])) {
+                    $this->cargarImagenProducto($producto, $item["imagen"], $key);
+                }
+            }
         } else {
-            // cargar imagen
-            if ($datos["imagen"] && !is_string($datos["imagen"])) {
-                $this->cargarFoto($catalogo, $datos["imagen"]);
+            // ACTUALIZAR DATOS DE LOS PRODUCTOS EXISTENTES
+            // productos
+            foreach ($datos["productos"] as $key => $item) {
+                $producto = Producto::find($item["id"]);
+                $producto->update([
+                    "codigo" => $item["codigo"],
+                    "nombre" => $item["nombre"],
+                    "moneda" => $item["moneda"],
+                    "precio" => $item["precio"],
+                ]);
+
+                foreach ($item["producto_descripcions"] as $descripcion) {
+                    $producto_descripcion = ProductoDescripcion::find($descripcion["id"]);
+                    $producto_descripcion->update([
+                        "descripcion" => $descripcion["descripcion"]
+                    ]);
+                }
+
+                // cargar imagen producto
+                if ($item["imagen"] && !is_string($item["imagen"])) {
+                    $this->cargarImagenProducto($producto, $item["imagen"], $key);
+                }
             }
         }
 
+        // cargar fondo imagen
+        if ($datos["imagen"] && !is_string($datos["imagen"])) {
+            $this->cargarFondo($catalogo, $datos["imagen"]);
+        }
+
         // registrar accion
-        $this->historialAccionService->registrarAccion($this->modulo, "MODIFICACIÓN", "ACTUALIZÓ UN CATALOGO", $old_catalogo, $catalogo->withoutRelations());
+        $this->historialAccionService->registrarAccion($this->modulo, "MODIFICACIÓN", "ACTUALIZÓ UN CATALOGO", $old_catalogo, $catalogo, ["productos"]);
 
         return $catalogo;
     }
@@ -150,7 +215,7 @@ class CatalogoService
         $catalogo->delete();
 
         // registrar accion
-        $this->historialAccionService->registrarAccion($this->modulo, "ELIMINACIÓN", "ELIMINÓ UN CATALOGO", $old_catalogo, $catalogo);
+        $this->historialAccionService->registrarAccion($this->modulo, "ELIMINACIÓN", "ELIMINÓ UN CATALOGO", $old_catalogo, $catalogo, ["productos"]);
 
         return true;
     }
@@ -162,7 +227,7 @@ class CatalogoService
      * @param UploadedFile $imagen
      * @return void
      */
-    public function cargarFoto(Catalogo $catalogo, UploadedFile $imagen): void
+    public function cargarFondo(Catalogo $catalogo, UploadedFile $imagen): void
     {
         if ($catalogo->imagen) {
             \File::delete(public_path("imgs/catalogos/" . $catalogo->imagen));
@@ -171,5 +236,24 @@ class CatalogoService
         $nombre = $catalogo->id . time();
         $catalogo->imagen = $this->cargarArchivoService->cargarArchivo($imagen, public_path("imgs/catalogos"), $nombre);
         $catalogo->save();
+    }
+
+
+    /**
+     * Cargar imagen producto
+     *
+     * @param Producto $producto
+     * @param UploadedFile $imagen
+     * @return void
+     */
+    public function cargarImagenProducto(Producto $producto, UploadedFile $imagen, $index): void
+    {
+        if ($producto->imagen) {
+            \File::delete(public_path("imgs/productos/" . $producto->imagen));
+        }
+
+        $nombre = $index . $producto->id . time();
+        $producto->imagen = $this->cargarArchivoService->cargarArchivo($imagen, public_path("imgs/productos"), $nombre);
+        $producto->save();
     }
 }

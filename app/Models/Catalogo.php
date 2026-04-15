@@ -11,10 +11,9 @@ class Catalogo extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        "nombre",
-        "tipo",
+        "pagina_id",
         "imagen",
-        "descargar"
+        "estado",
     ];
 
     protected $appends = ["url_imagen"];
@@ -27,5 +26,10 @@ class Catalogo extends Model
     public function productos()
     {
         return $this->hasMany(Producto::class, 'catalogo_id');
+    }
+
+    public function pagina_catalogo()
+    {
+        return $this->belongsTo(PaginaCatalogo::class, 'pagina_id');
     }
 }

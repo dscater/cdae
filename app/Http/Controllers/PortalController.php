@@ -12,36 +12,28 @@ use PDF;
 
 class PortalController extends Controller
 {
-    public function index()
-    {
-        $catalogos = Catalogo::all();
-        return inertia("Portal/Inicio", compact("catalogos"));
-    }
-
-    public function productos(Catalogo $catalogo, Request $request)
+    public function index(Request $request)
     {
         $page = $request->page ?? 1;
         $page = is_string($page) ? (int)$page : $page;
-        $productos = Producto::where("catalogo_id", $catalogo->id)
-            ->where("estado", "PÚBLICO")->paginate(1);
-        return inertia("Portal/Productos", compact("catalogo", "productos", "page"));
+        $catalogos = Catalogo::where("estado", 1)
+            ->with(["pagina_catalogo:id,pagina", "productos.producto_descripcions"])->paginate(1);
+
+        $listCatalogos = Catalogo::with(["pagina_catalogo:id,pagina", "productos.producto_descripcions"])->where("estado", 1)->get();
+
+        return inertia("Portal/Inicio", compact("catalogos", "page", "listCatalogos"));
     }
 
     public function verProducto(Producto $producto)
     {
-        $catalogo = $producto->catalogo;
+        $catalogo = $producto->load(["catalogo", "producto_descripcions"]);
         return inertia("Portal/VerProducto", compact("producto", "catalogo"));
     }
-
-    public function descargar_catalogo(Catalogo $catalogo)
+    public function descargar_catalogo()
     {
-        if ($catalogo->descargar == 0) {
-            return redirect()->route('portal');
-        }
 
-        $productos = Producto::where("catalogo_id", $catalogo->id)
-            ->where("estado", "PÚBLICO")->get()->each->append('imagen_b64');;
-        $pdf = PDF::loadView('reportes.catalogo', compact('catalogo', 'productos'));
+        $catalogos = Catalogo::where("estado", 1)->get();
+        $pdf = PDF::loadView('reportes.catalogo', compact('catalogos'));
 
         // ENUMERAR LAS PÁGINAS USANDO CANVAS
         $pdf->output();
@@ -51,13 +43,14 @@ class PortalController extends Controller
         $ancho = $canvas->get_width();
         $canvas->page_text(round($ancho / 2, 0), 22, "{PAGE_NUM}/{PAGE_COUNT}", null, 11, array(0, 0, 0));
 
-        return $pdf->stream($catalogo->nombre . '.pdf');
+        return $pdf->stream('catalogo.pdf');
     }
 
     public function miCatalogo()
     {
         return inertia("Portal/MiCatalogo");
     }
+
 
     public function crearPedido(Request $request)
     {
@@ -66,11 +59,12 @@ class PortalController extends Controller
             "fecha" => date("Y-m-d"),
             "hora" => date("H:i:s"),
         ]);
-
         foreach ($request->productos as $producto) {
             $nuevo_pedido->pedido_detalles()->create([
                 "producto_id" => $producto["id"],
-                "precio" => $producto["precio"],
+                "cantidad" => $producto["cantidad"],
+                "precio" => $producto["producto"]["precio"],
+                "subtotal" => $producto["subtotal"],
             ]);
         }
 
@@ -83,21 +77,20 @@ class PortalController extends Controller
 
         $social = Social::first();
 
-
-
-        $total = $nuevo_pedido->pedido_detalles->sum("precio");
+        $total = $nuevo_pedido->pedido_detalles->sum("subtotal");
 
         $productos_txt  = "";
         foreach ($nuevo_pedido->pedido_detalles as $item) {
             $productos_txt .= "\nCódigo de Producto: " . $item->producto->codigo .
                 ", Producto: " . $item->producto->nombre .
-                ", Precio: " . number_format($item->precio, 2, ".", ",") . " Bs.";
+                ", Precio: " . number_format($item->precio, 2, ".", ",") . " Bs." .
+                ", Cantidad: " . $item->cantidad .
+                ", Total: " . number_format($item->subtotal, 2, ".", ",");
         }
 
         $productos_txt .= "\n\nPedido Total: " . number_format($total, 2, ".", ",") . " Bs.";
 
         $mensaje = "Hola, revisé tu catálogo digital, me interesan los siguientes productos:" . $productos_txt;
-
         $whatsapp = "https://wa.me/" . $social->whatsapp . "?text=" . urlencode($mensaje);
 
         return response()->JSON([

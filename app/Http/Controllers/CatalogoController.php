@@ -49,8 +49,8 @@ class CatalogoController extends Controller
         $perPage = $request->perPage;
         $page = (int)($request->input("page", 1));
         $search = (string)$request->input("search", "");
-        $orderByCol = $request->orderByCol;
-        $desc = $request->desc;
+        $orderBy = $request->orderBy;
+        $orderAsc = $request->orderAsc;
 
         $columnsSerachLike = [
             "codigo",
@@ -62,9 +62,9 @@ class CatalogoController extends Controller
         $columnsFilter = [];
         $columnsBetweenFilter = [];
         $arrayOrderBy = [];
-        if ($orderByCol && $desc) {
+        if ($orderBy && $orderAsc) {
             $arrayOrderBy = [
-                [$orderByCol, $desc]
+                [$orderBy, $orderAsc]
             ];
         }
 
@@ -87,6 +87,11 @@ class CatalogoController extends Controller
     {
 
         return response()->JSON([]);
+    }
+
+    public function create()
+    {
+        return Inertia::render("Admin/Catalogos/Create");
     }
 
     /**
@@ -120,6 +125,13 @@ class CatalogoController extends Controller
     public function show(Catalogo $catalogo): JsonResponse
     {
         return response()->JSON($catalogo);
+    }
+
+    public function edit(Catalogo $catalogo)
+    {
+        $catalogo = $catalogo->load(["productos.producto_descripcions"]);
+
+        return Inertia::render("Admin/Catalogos/Edit", compact("catalogo"));
     }
 
     public function byCodigo(Request $request): JsonResponse

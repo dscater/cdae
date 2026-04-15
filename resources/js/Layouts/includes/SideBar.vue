@@ -151,6 +151,15 @@ onUnmounted(() => {});
                     <ItemMenu
                         v-if="
                             permisos == '*' ||
+                            permisos.includes('pagina_catalogos.index')
+                        "
+                        :label="'Páginas de Catálogos'"
+                        :ruta="'pagina_catalogos.index'"
+                        :icon="'fa fa-table'"
+                    ></ItemMenu>
+                    <ItemMenu
+                        v-if="
+                            permisos == '*' ||
                             permisos.includes('usuarios.index')
                         "
                         :label="'Usuarios'"

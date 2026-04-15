@@ -21,6 +21,16 @@ class PermisoService
             "usuarios.destroy",
             "usuarios.password",
 
+            "pagina_catalogos.paginado",
+            "pagina_catalogos.index",
+            "pagina_catalogos.listado",
+            "pagina_catalogos.create",
+            "pagina_catalogos.store",
+            "pagina_catalogos.edit",
+            "pagina_catalogos.show",
+            "pagina_catalogos.update",
+            "pagina_catalogos.destroy",
+
             "catalogos.paginado",
             "catalogos.index",
             "catalogos.listado",

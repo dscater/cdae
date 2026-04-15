@@ -7,8 +7,6 @@ import { useAxios } from "@/composables/axios/useAxios";
 import { ref, onMounted, onBeforeMount } from "vue";
 import { useAppStore } from "@/stores/aplicacion/appStore";
 // import { useMenu } from "@/composables/useMenu";
-import Formulario from "./Formulario.vue";
-import { buttonProps } from "element-plus";
 // const { mobile, identificaDispositivo } = useMenu();
 const { props: props_page } = usePage();
 const appStore = useAppStore();
@@ -32,18 +30,18 @@ const headers = [
         width: "4%",
     },
     {
-        label: "NOMBRE",
-        key: "nombre",
+        label: "PÁGINA",
+        key: "pagina_catalogo.pagina",
         sortable: true,
     },
     {
-        label: "IMAGEN BOTÓN",
-        key: "imagen",
+        label: "PRODUCTOS",
+        key: "pagina_catalogo.productos",
         sortable: true,
     },
     {
-        label: "DESCARGA",
-        key: "descargar",
+        label: "ESTADO",
+        key: "estado",
         sortable: true,
     },
     {
@@ -124,7 +122,7 @@ const eliminarCatalogo = (item) => {
             <div class="col-md-12">
                 <div class="row">
                     <div class="col-md-4">
-                        <button
+                        <Link
                             v-if="
                                 props_page.auth?.user.permisos == '*' ||
                                 props_page.auth?.user.permisos.includes(
@@ -133,10 +131,10 @@ const eliminarCatalogo = (item) => {
                             "
                             type="button"
                             class="btn btn-success"
-                            @click="agregarRegistro"
+                            :href="route('catalogos.create')"
                         >
                             <i class="fa fa-plus"></i> Nuevo Catálogo
-                        </button>
+                        </Link>
                     </div>
                     <div class="col-md-8 my-1">
                         <div class="row justify-content-end">
@@ -172,6 +170,7 @@ const eliminarCatalogo = (item) => {
                             :api="true"
                             :url="route('catalogos.paginado')"
                             :numPages="5"
+                            :per-page="10"
                             :multiSearch="multiSearch"
                             :syncOrderBy="'id'"
                             :syncOrderAsc="'DESC'"
@@ -189,18 +188,18 @@ const eliminarCatalogo = (item) => {
                                     ><i class="fa-3x" :class="item.imagen"></i
                                 ></span>
                             </template>
-                            <template #descargar="{ item }">
+                            <template #estado="{ item }">
                                 <span
                                     class="text-md"
                                     :class="
-                                        item.descargar
+                                        item.estado == 1
                                             ? 'badge bg-success'
                                             : 'badge bg-danger'
                                     "
                                 >
                                     {{
-                                        item.descargar
-                                            ? "HABILITADO"
+                                        item.estado == 1
+                                            ? "PÚBLICO"
                                             : "DESHABILITADO"
                                     }}
                                 </span>
@@ -220,15 +219,13 @@ const eliminarCatalogo = (item) => {
                                         content="Editar"
                                         placement="left-start"
                                     >
-                                        <button
+                                        <Link
                                             class="btn btn-warning"
-                                            @click="
-                                                setCatalogo(item);
-                                                accion_formulario = 1;
-                                                muestra_formulario = true;
+                                            :href="
+                                                route('catalogos.edit', item.id)
                                             "
                                         >
-                                            <i class="fa fa-pen"></i></button
+                                            <i class="fa fa-pen"></i> </Link
                                     ></el-tooltip>
                                 </template>
 
@@ -261,11 +258,5 @@ const eliminarCatalogo = (item) => {
                 </div>
             </div>
         </div>
-        <Formulario
-            :muestra_formulario="muestra_formulario"
-            :accion_formulario="accion_formulario"
-            @envio-formulario="updateDatatable"
-            @cerrar-formulario="muestra_formulario = false"
-        ></Formulario>
     </Content>
 </template>

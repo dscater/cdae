@@ -12,10 +12,10 @@ class Producto extends Model
     protected $fillable = [
         "catalogo_id",
         "codigo",
-        "precio",
         "nombre",
+        "moneda",
+        "precio",
         "imagen",
-        "estado",
     ];
 
     protected $appends = ["url_imagen"];
@@ -43,5 +43,10 @@ class Producto extends Model
     public function catalogo()
     {
         return $this->belongsTo(Catalogo::class, 'catalogo_id');
+    }
+
+    public function producto_descripcions()
+    {
+        return $this->hasMany(ProductoDescripcion::class, 'producto_id');
     }
 }

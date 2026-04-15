@@ -83,6 +83,18 @@ const quitar = (index) => {
     });
 };
 
+const total = computed(() => {
+    const suma_total = catalogoStore.listProductos.reduce((value, item) => {
+        return value + item.subtotal;
+    }, 0);
+    return suma_total;
+});
+
+const actualizaCantidad = (e, index) => {
+    const cantidad = e.target.value;
+    catalogoStore.actualizarCantidad(index, cantidad);
+};
+
 onMounted(() => {});
 
 onBeforeUnmount(() => {});
@@ -107,25 +119,81 @@ onBeforeUnmount(() => {});
                     class="menu_inicio"
                     v-if="catalogoStore.listProductos.length > 0"
                 >
-                    <div class="contenedor_producto">
-                        <div class="productos">
-                            <div
-                                class="producto"
-                                v-for="(
-                                    item, index
-                                ) in catalogoStore.listProductos"
+                    <table class="table table-bordered">
+                        <thead>
+                            <th>N°</th>
+                            <th></th>
+                            <th>Producto</th>
+                            <th>C/U Bs.</th>
+                            <th>Cantidad</th>
+                            <th>Subtotal</th>
+                            <th></th>
+                        </thead>
+                        <tbody>
+                            <template
+                                v-if="catalogoStore.listProductos.length > 0"
                             >
-                                <button
-                                    class="btn btn-danger quitarProducto"
-                                    @click="quitar(index)"
+                                <tr
+                                    v-for="(
+                                        item, index
+                                    ) in catalogoStore.listProductos"
                                 >
-                                    X
-                                </button>
-
-                                <img :src="item.url_imagen" alt="" />
-                            </div>
-                        </div>
-                    </div>
+                                    <td>
+                                        {{ index + 1 }}
+                                    </td>
+                                    <td>
+                                        <img
+                                            :src="item.producto.url_imagen"
+                                            alt=""
+                                            height="90px"
+                                        />
+                                    </td>
+                                    <td>{{ item.producto.nombre }}</td>
+                                    <td>{{ item.producto.precio }}</td>
+                                    <td>
+                                        <input
+                                            type="number"
+                                            class="form-control"
+                                            v-model="item.cantidad"
+                                            @change="
+                                                actualizaCantidad($event, index)
+                                            "
+                                            @keyup="
+                                                actualizaCantidad($event, index)
+                                            "
+                                        />
+                                    </td>
+                                    <td>{{ item.subtotal }}</td>
+                                    <td>
+                                        <button
+                                            class="btn btn-danger"
+                                            @click="quitar(index)"
+                                        >
+                                            X
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td
+                                        class="text-right font-weight-bold text-lg"
+                                        colspan="5"
+                                    >
+                                        TOTAL
+                                    </td>
+                                    <td class="font-weight-bold text-lg">
+                                        {{ total }}
+                                    </td>
+                                </tr>
+                            </template>
+                            <template v-else>
+                                <tr>
+                                    <td colspan="5">
+                                        No se agregó ningún Producto
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
                 </div>
                 <div
                     class="enviar_pedido mt-1"

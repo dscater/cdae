@@ -2,10 +2,11 @@ import { onMounted, ref } from "vue";
 
 const oPaginaCatalogo = ref({
     id: 0,
-    nombre: "",
-    tipo: "imagen",
-    imagen: "",
-    descargar: 1,
+    pagina: "",
+    descripcion: "",
+    productos: "",
+    redes: "",
+    url_pagina: "",
     _method: "POST",
 });
 
@@ -13,9 +14,11 @@ export const usePaginaCatalogos = () => {
     const setPaginaCatalogo = (item = null) => {
         if (item) {
             oPaginaCatalogo.value.id = item.id;
-            oPaginaCatalogo.value.nombre = item.nombre;
-            oPaginaCatalogo.value.tipo = item.tipo;
-            oPaginaCatalogo.value.descargar = item.descargar;
+            oPaginaCatalogo.value.pagina = item.pagina;
+            oPaginaCatalogo.value.descripcion = item.descripcion;
+            oPaginaCatalogo.value.productos = item.productos;
+            oPaginaCatalogo.value.redes = item.redes;
+            oPaginaCatalogo.value.url_pagina = item.url_pagina;
             oPaginaCatalogo.value._method = "PUT";
             return oPaginaCatalogo;
         }
@@ -24,10 +27,10 @@ export const usePaginaCatalogos = () => {
 
     const limpiarPaginaCatalogo = () => {
         oPaginaCatalogo.value.id = 0;
-        oPaginaCatalogo.value.nombre = "";
-        oPaginaCatalogo.value.tipo = "imagen";
-        oPaginaCatalogo.value.imagen = "";
-        oPaginaCatalogo.value.descargar = 1;
+        oPaginaCatalogo.value.pagina = "";
+        oPaginaCatalogo.value.descripcion = "";
+        oPaginaCatalogo.value.productos = "";
+        oPaginaCatalogo.value.redes = "";
         oPaginaCatalogo.value._method = "POST";
     };
 

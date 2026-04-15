@@ -1,72 +1,41 @@
 <script setup>
-import MiModal from "@/Components/MiModal.vue";
 import { useForm, usePage } from "@inertiajs/vue3";
-import { useCatalogos } from "@/composables/catalogos/useCatalogos";
-import { watch, ref, computed, defineEmits, onMounted, nextTick } from "vue";
+import {
+    watch,
+    ref,
+    computed,
+    defineEmits,
+    onMounted,
+    nextTick,
+    onBeforeMount,
+} from "vue";
+import Formulario from "../PaginaCatalogos/Formulario.vue";
+import { usePaginaCatalogos } from "@/composables/pagina_catalogos/usePaginaCatalogos";
+const { oPaginaCatalogo, setPaginaCatalogo, limpiarPaginaCatalogo } =
+    usePaginaCatalogos();
 const props = defineProps({
-    muestra_formulario: {
-        type: Boolean,
-        default: false,
-    },
-    accion_formulario: {
-        type: Number,
-        default: 0,
+    catalogo: {
+        type: Object,
+        default: {
+            id: 0,
+        },
     },
 });
 
-const { oCatalogo, limpiarCatalogo } = useCatalogos();
-const accion_form = ref(props.accion_formulario);
-const muestra_form = ref(props.muestra_formulario);
+let form = useForm(props.catalogo);
+watch(
+    () => props.catalogo,
+    (newValue) => {
+        form = useForm(newValue);
+    },
+);
+
 const enviando = ref(false);
-let form = useForm(oCatalogo.value);
-watch(
-    () => props.muestra_formulario,
-    (newValue) => {
-        muestra_form.value = newValue;
-        if (muestra_form.value) {
-            cargarIconos();
-            if (archivo.value) {
-                archivo.value.value = null;
-            }
-            document
-                .getElementsByTagName("body")[0]
-                .classList.add("modal-open");
-            form = useForm(oCatalogo.value);
-        } else {
-            document
-                .getElementsByTagName("body")[0]
-                .classList.remove("modal-open");
-        }
-    },
-);
-watch(
-    () => props.accion_formulario,
-    (newValue) => {
-        accion_form.value = newValue;
-        if (accion_form.value == 0) {
-            form["_method"] = "POST";
-        }
-    },
-);
-
-const { flash } = usePage().props;
-
-function cargaArchivo(e, key) {
-    form[key] = null;
-    form[key] = e.target.files[0];
-}
-
-const tituloDialog = computed(() => {
-    return accion_form.value == 0
-        ? `<i class="fa fa-plus"></i> Nuevo Catálogo`
-        : `<i class="fa fa-edit"></i> Editar Catálogo`;
-});
-
 const textBtn = computed(() => {
     if (enviando.value) {
         return `<i class="fa fa-spin fa-spinner"></i> Enviando...`;
     }
-    if (accion_form.value == 0) {
+    if (form.id == 0) {
         return `<i class="fa fa-save"></i> Guardar`;
     }
     return `<i class="fa fa-edit"></i> Actualizar`;
@@ -75,7 +44,7 @@ const textBtn = computed(() => {
 const enviarFormulario = () => {
     enviando.value = true;
     let url =
-        accion_form.value == 0
+        form.id == 0
             ? route("catalogos.store")
             : route("catalogos.update", form.id);
 
@@ -96,8 +65,6 @@ const enviarFormulario = () => {
                 },
             });
             form.reset();
-            limpiarCatalogo();
-            emits("envio-formulario");
         },
         onError: (err, code) => {
             console.log(code ?? "");
@@ -135,234 +102,301 @@ const enviarFormulario = () => {
     });
 };
 
-const emits = defineEmits(["cerrar-formulario", "envio-formulario"]);
-
-watch(muestra_form, (newVal) => {
-    if (!newVal) {
-        emits("cerrar-formulario");
-    }
-});
-
 const archivo = ref(null);
-const cargarArchivo = (e, key) => {
+const cargarArchivoProducto = (e, index) => {
+    form.productos[index]["imagen"] = null;
+    const file = e.target.files[0];
+    if (file) {
+        form.productos[index]["imagen"] = file;
+    }
+};
+
+const cargarArchivoFondo = (e, key) => {
     form[key] = null;
     const file = e.target.files[0];
     if (file) {
-        form[key] = e.target.files[0];
+        form[key] = file;
     }
 };
 
-const cerrarFormulario = () => {
-    muestra_form.value = false;
-    document.getElementsByTagName("body")[0].classList.remove("modal-open");
+const listPaginaCatalogos = ref([]);
+const cargarCatalogoPaginas = () => {
+    axios.get(route("pagina_catalogos.listado")).then((response) => {
+        listPaginaCatalogos.value = response.data.pagina_catalogos;
+
+        if (form.id != 0) {
+            asignaPaginaCatalogoEdit(form.pagina_id);
+        }
+        // pruebas();
+    });
+};
+const asignaPaginaCatalogoEdit = (value) => {
+    const item = listPaginaCatalogos.value.filter(
+        (elem) => elem.id == value,
+    )[0];
+    setPaginaCatalogo(item);
 };
 
-const listIconos = ref([]);
-const cargarIconos = () => {
-    axios.get(route("iconos.lista")).then((response) => {
-        listIconos.value = response.data;
+const asignaPaginaCatalogo = (value) => {
+    const item = listPaginaCatalogos.value.filter(
+        (elem) => elem.id == value,
+    )[0];
+    if (!item) {
+        limpiarPaginaCatalogo();
+        return;
+    }
+    setPaginaCatalogo(item);
+    generarProductos();
+};
+
+const muestra_estructura = ref(false);
+const verEstructura = (item) => {
+    muestra_estructura.value = true;
+};
+
+const generarProductos = () => {
+    form.productos = [];
+    for (let i = 1; i <= oPaginaCatalogo.value.productos; i++) {
+        agregarProducto();
+    }
+};
+const agregarProducto = () => {
+    let descripcions = [];
+    for (let i = 1; i <= oPaginaCatalogo.value.descripcion; i++) {
+        descripcions.push({
+            id: 0,
+            producto_id: "",
+            descripcion: "",
+        });
+    }
+    form.productos.push({
+        id: 0,
+        catalogo_id: "",
+        codigo: "",
+        nombre: "",
+        moneda: "Bs.",
+        precio: 100,
+        imagen: "",
+        producto_descripcions: [...descripcions],
     });
 };
 
-const iconoSeleccionado = ref(null);
-const busqueda = ref("");
-
-// filtrar iconos (por nombre o clase)
-const iconosFiltrados = computed(() => {
-    if (!busqueda.value) return listIconos.value;
-
-    return listIconos.value.filter(
-        (i) =>
-            i.nombre.toLowerCase().includes(busqueda.value.toLowerCase()) ||
-            i.clase.toLowerCase().includes(busqueda.value.toLowerCase()),
-    );
+onBeforeMount(() => {
+    cargarCatalogoPaginas();
 });
 
-const seleccionarIcono = (icono) => {
-    iconoSeleccionado.value = icono.clase;
-    form.imagen = icono.clase;
+const pruebas = () => {
+    form.pagina_id = 1;
+    asignaPaginaCatalogo(1);
 };
-
 onMounted(() => {});
 </script>
 
 <template>
-    <MiModal
-        :open_modal="muestra_form"
-        @close="cerrarFormulario"
-        :size="'modal-xl'"
-        :header-class="'bg-principal'"
-        :footer-class="'justify-content-end'"
-    >
-        <template #header>
-            <h4 class="modal-title text-white" v-html="tituloDialog"></h4>
-            <button
-                type="button"
-                class="close"
-                @click.prevent="cerrarFormulario()"
-            >
-                <span aria-hidden="true">×</span>
-            </button>
-        </template>
-
-        <template #body>
-            <form @submit.prevent="enviarFormulario()">
-                <p class="text-muted text-xs mb-0">
-                    Todos los campos con
-                    <span class="text-danger">(*)</span> son obligatorios.
-                </p>
-                <div class="row">
-                    <div class="col-md-7 mt-2">
-                        <label class="required">Nombre Menú</label>
-                        <el-input
-                            type="text"
-                            :class="{
-                                'parsley-error': form.errors?.nombre,
-                            }"
-                            v-model="form.nombre"
-                            autosize
-                        ></el-input>
-                        <ul
-                            v-if="form.errors?.nombre"
-                            class="d-block text-danger list-unstyled"
-                        >
-                            <li class="parsley-required">
-                                {{ form.errors?.nombre }}
-                            </li>
-                        </ul>
+    <form @submit.prevent="enviarFormulario()">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">
+                            <i class="fa fa-list"></i> Datos del Catálogo
+                        </h4>
                     </div>
-                    <div class="col-md-4 mt-2">
-                        <label class="required">Tipo de Imagen</label>
-                        <br />
-                        <el-switch
-                            size="large"
-                            active-text="CARGAR IMAGEN"
-                            inactive-text="USAR ICONO"
-                            v-model="form.tipo"
-                            :active-value="'imagen'"
-                            :inactive-value="'icono'"
-                            style="
-                                --el-switch-on-color: #257eb3;
-                                --el-switch-off-color: #555555;
-                            "
-                        />
-                    </div>
-                    <div class="col-md-5 mt-2" v-if="form.tipo == 'imagen'">
-                        <label class="required">Imagen del Botón</label
-                        ><small class="text-muted"
-                            >(Tamaño recomendado: 530px x 90px)</small
-                        >
-                        <input
-                            type="file"
-                            class="form-control"
-                            :class="{
-                                'parsley-error': form.errors?.imagen,
-                            }"
-                            ref="archivo"
-                            @change="cargarArchivo($event, 'imagen')"
-                        />
-                        <ul
-                            v-if="form.errors?.imagen"
-                            class="d-block text-danger list-unstyled"
-                        >
-                            <li class="parsley-required">
-                                {{ form.errors?.imagen }}
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="col-md-5 mt-2" v-if="form.tipo == 'icono'">
-                        <label class="required">Seleccionar Icono</label>
-
-                        <input
-                            type="text"
-                            class="form-control mb-2"
-                            v-model="busqueda"
-                            placeholder="Buscar icono..."
-                        />
-
-                        <!-- Preview -->
-                        <div v-if="form.imagen" class="mb-2 text-center">
-                            <small class="text-muted">Seleccionado:</small>
-                            <div style="font-size: 30px">
-                                <i :class="form.imagen"></i>
-                            </div>
-                        </div>
-
-                        <!-- Grid de iconos -->
-                        <div
-                            style="
-                                max-height: 220px;
-                                overflow-y: auto;
-                                border: 1px solid #ddd;
-                                border-radius: 6px;
-                                padding: 10px;
-                            "
-                        >
-                            <div
-                                class="d-flex flex-wrap gap-2"
-                                style="gap: 10px"
-                            >
-                                <div
-                                    style="cursor: pointer"
-                                    v-for="icono in iconosFiltrados"
-                                    :key="icono.clase"
-                                    @click="seleccionarIcono(icono)"
-                                    class="icon-item"
-                                    :class="{
-                                        'icon-selected':
-                                            form.imagen === icono.clase,
-                                    }"
-                                    title="icono.nombre"
+                    <div class="card-body pt-0">
+                        <div class="row">
+                            <div class="col-md-6 mt-2">
+                                <Formulario
+                                    :muestra_formulario="muestra_estructura"
+                                    :accion_formulario="1"
+                                    @cerrar-formulario="
+                                        muestra_estructura = false
+                                    "
+                                ></Formulario>
+                                <label class="required"
+                                    >Seleccionar Página de Catálogo</label
                                 >
-                                    <i :class="icono.clase"></i>
+                                <div class="input-group">
+                                    <div class="form-control border-0 p-0">
+                                        <el-select
+                                            type="text"
+                                            class="el-select-input-group-left"
+                                            v-model="form.pagina_id"
+                                            placeholder="- Seleccione -"
+                                            size="large"
+                                            no-data-text="Sin datos"
+                                            no-match-text="Sin resultados"
+                                            filterable
+                                            @change="asignaPaginaCatalogo"
+                                        >
+                                            <el-option
+                                                v-for="item in listPaginaCatalogos"
+                                                :key="item.id"
+                                                :value="item.id"
+                                                :label="`Página ${item.pagina}`"
+                                            ></el-option>
+                                        </el-select>
+                                    </div>
+                                    <div class="input-group-append">
+                                        <button
+                                            :disabled="oPaginaCatalogo.id == 0"
+                                            type="button"
+                                            class="btn btn-default"
+                                            title="Estructura"
+                                            @click.prevent="verEstructura"
+                                        >
+                                            <i class="fa fa-image"></i>
+                                        </button>
+                                    </div>
                                 </div>
+
+                                <ul
+                                    v-if="form.errors?.pagina_id"
+                                    class="d-block text-danger list-unstyled"
+                                >
+                                    <li class="parsley-required">
+                                        {{ form.errors?.pagina_id }}
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6 mt-2">
+                                <label class="required">Estado</label>
+                                <br />
+                                <el-switch
+                                    size="large"
+                                    active-text="PÚBLICO"
+                                    inactive-text="DESHABILITADO"
+                                    v-model="form.estado"
+                                    :active-value="1"
+                                    :inactive-value="0"
+                                    style="
+                                        --el-switch-on-color: #13ce66;
+                                        --el-switch-off-color: #ff4949;
+                                    "
+                                />
+                            </div>
+                            <div class="col-md-5 mt-2">
+                                <label class="required">Imagen de Fondo</label
+                                ><small class="text-muted"
+                                    >(Tamaño recomendado: A4)</small
+                                >
+                                <input
+                                    type="file"
+                                    class="form-control"
+                                    :class="{
+                                        'parsley-error': form.errors?.imagen,
+                                    }"
+                                    ref="archivo"
+                                    @change="
+                                        cargarArchivoFondo($event, 'imagen')
+                                    "
+                                />
+                                <ul
+                                    v-if="form.errors?.imagen"
+                                    class="d-block text-danger list-unstyled"
+                                >
+                                    <li class="parsley-required">
+                                        {{ form.errors?.imagen }}
+                                    </li>
+                                </ul>
                             </div>
                         </div>
-                        <ul
-                            v-if="form.errors?.imagen"
-                            class="d-block text-danger list-unstyled"
-                        >
-                            <li class="parsley-required">
-                                {{ form.errors?.imagen }}
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="col-md-4 mt-2">
-                        <label class="required">Permitir descarga</label>
-                        <br />
-                        <el-switch
-                            size="large"
-                            active-text="HABILITADO"
-                            inactive-text="DESHABILITADO"
-                            v-model="form.descargar"
-                            :active-value="1"
-                            :inactive-value="0"
-                            style="
-                                --el-switch-on-color: #13ce66;
-                                --el-switch-off-color: #ff4949;
-                            "
-                        />
                     </div>
                 </div>
-            </form>
-        </template>
-        <template #footer>
-            <button
-                type="button"
-                class="btn btn-default"
-                @click.prevent="cerrarFormulario()"
-            >
-                Cerrar
-            </button>
-            <button
-                type="button"
-                class="btn btn-success"
-                :disabled="enviando"
-                @click.prevent="enviarFormulario"
-                v-html="textBtn"
-            ></button>
-        </template>
-    </MiModal>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12" v-for="(item, index) in form.productos">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">
+                            <i class="fa fa-image"></i> Producto {{ index + 1 }}
+                        </h4>
+                    </div>
+                    <div class="card-body pt-1">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label>Código</label>
+                                <input
+                                    type="text"
+                                    v-model="item.codigo"
+                                    class="form-control"
+                                />
+                            </div>
+                            <div class="col-md-4">
+                                <label>Nombre</label>
+                                <input
+                                    type="text"
+                                    v-model="item.nombre"
+                                    class="form-control"
+                                />
+                            </div>
+                            <div class="col-md-4">
+                                <label>Texto moneda</label>
+                                <input
+                                    type="text"
+                                    v-model="item.moneda"
+                                    class="form-control"
+                                />
+                            </div>
+                            <div class="col-md-4">
+                                <label>Precio</label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    v-model="item.precio"
+                                    class="form-control"
+                                />
+                            </div>
+                            <div class="col-md-4">
+                                <label>Imagen</label>
+                                <input
+                                    type="file"
+                                    class="form-control"
+                                    @change="
+                                        cargarArchivoProducto($event, index)
+                                    "
+                                />
+                            </div>
+                            <div
+                                class="col-12 mt-2"
+                                v-for="(
+                                    descripcion, index_desc
+                                ) in item.producto_descripcions"
+                            >
+                                <label>Descripción {{ index_desc + 1 }}</label>
+                                <el-input
+                                    type="textarea"
+                                    v-model="descripcion.descripcion"
+                                    autosize
+                                ></el-input>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <ul
+                    v-if="form.errors?.productos"
+                    class="d-block text-danger list-unstyled"
+                >
+                    <li class="parsley-required">
+                        {{ form.errors?.productos }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="row mt-2 mb-3">
+            <div class="col-md-3">
+                <button
+                    type="button"
+                    class="btn btn-success w-100"
+                    :disabled="enviando"
+                    @click.prevent="enviarFormulario"
+                    v-html="textBtn"
+                ></button>
+            </div>
+        </div>
+    </form>
 </template>
 
 <style scoped>

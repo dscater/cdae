@@ -10,10 +10,10 @@
         }
 
         @page {
-            margin-top: 1.5cm;
-            margin-bottom: 0.3cm;
-            margin-left: 0.3cm;
-            margin-right: 0.3cm;
+            margin-top: 1cm;
+            margin-bottom: 1cm;
+            margin-left: 1.5cm;
+            margin-right: 1cm;
         }
 
         table {
@@ -160,7 +160,8 @@
         <thead class="bg-principal">
             <tr>
                 <th width="3%">N°</th>
-                <th>CATÁLOGO</th>
+                <th width="10%">CÓD. CÁTALOGO</th>
+                <th width="10%">FORMATO PÁGINA</th>
                 <th>PRODUCTO</th>
                 <th>IMAGEN</th>
             </tr>
@@ -173,7 +174,8 @@
                 @foreach ($catalogo->productos as $producto)
                     <tr>
                         <td class="centreado">{{ $cont++ }}</td>
-                        <td class="">{{ $catalogo->nombre }}</td>
+                        <td class="centreado">{{ $catalogo->id }}</td>
+                        <td class="centreado">{{ $catalogo->pagina_catalogo->pagina }}</td>
                         <td class="">{{ $producto->nombre }}</td>
                         <td class="img_celda centreado">
                             <img src="{{ public_path('imgs/productos/' . $producto->imagen) }}" alt="Foto">

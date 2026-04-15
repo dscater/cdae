@@ -13,6 +13,14 @@ class PaginaCatalogo extends Model
     protected $fillable = [
         "pagina",
         "descripcion",
-        "imagenes",
+        "productos",
+        "redes",
     ];
+
+    protected $appends = ["url_pagina"];
+
+    public function getUrlPaginaAttribute()
+    {
+        return asset("imgs/pagina_catalogos/" . $this->pagina . ".jpg");
+    }
 }

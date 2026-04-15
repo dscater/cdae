@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger("pagina_id");
             $table->string("imagen", 255)->nullable();
-            $table->string("estado");
+            $table->integer("estado");
             $table->timestamps();
             $table->softDeletes();
         });

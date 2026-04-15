@@ -9,17 +9,45 @@ export const useCatalogoStore = defineStore("catalogo", {
             : [],
     }),
     actions: {
-        agregarProducto(producto) {
+        agregarProducto(producto, cantidad) {
+            if (!cantidad || parseFloat(cantidad) < 1) {
+                toast.error("Debes ingresar una cantidad valida");
+                return;
+            }
             if (this.listProductos.some((p) => p.id === producto.id)) {
                 toast.warning("El producto ya está en el pedido");
                 return;
             }
-            this.listProductos.push(producto);
+            const subtotal = parseFloat(cantidad) * producto.precio;
+            this.listProductos.push({
+                id: producto.id,
+                producto: producto,
+                cantidad: cantidad,
+                subtotal,
+            });
             localStorage.setItem(
                 "listProductos",
                 JSON.stringify(this.listProductos),
             );
             toast.success("Producto agregado al pedido");
+        },
+        actualizarCantidad(index, cantidad) {
+            if (!cantidad || parseFloat(cantidad) < 1) {
+                toast.error("Debes ingresar una cantidad valida");
+                return;
+            }
+            const subtotal =
+                parseFloat(cantidad) *
+                this.listProductos[index].producto.precio;
+
+            this.listProductos[index].cantidad = cantidad;
+            this.listProductos[index].subtotal = subtotal;
+
+            localStorage.setItem(
+                "listProductos",
+                JSON.stringify(this.listProductos),
+            );
+            toast.success("Cantidad actualizada");
         },
         quitarProducto(index) {
             this.listProductos.splice(index, 1);

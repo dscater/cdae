@@ -16,6 +16,8 @@ return new class extends Migration
             $table->unsignedBigInteger("pedido_id");
             $table->unsignedBigInteger("producto_id");
             $table->decimal("precio", 24, 2)->default(0);
+            $table->integer("cantidad");
+            $table->decimal("subtotal", 24, 2)->default(0);
             $table->timestamps();
 
             $table->foreign("pedido_id")->references("id")->on("pedidos")->onDelete("cascade");

@@ -27,7 +27,6 @@ const buscarProducto = () => {
 
 const intervalSearch = ref(null);
 const onSearch = () => {
-    console.log("AAAAAAAAAAA");
     clearInterval(intervalSearch.value);
     intervalSearch.value = setTimeout(() => {
         if (!txtSearch.value) {

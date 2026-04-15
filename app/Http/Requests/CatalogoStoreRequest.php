@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\CatalogoProductosRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CatalogoStoreRequest extends FormRequest
@@ -22,28 +23,24 @@ class CatalogoStoreRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            "nombre" => "required|string|unique:catalogos,nombre",
-            "tipo" => "required",
-            "descargar" => "required",
+            "pagina_id" => "required",
+            "estado" => "required",
+            "imagen" => "required|image|mimes:webp,jpeg,png,jpg,gif,svg|max:4096",
+            "productos" => ["required", "array", "min:1", new CatalogoProductosRule()]
         ];
-
-        if ($this->tipo === 'imagen') {
-            $rules["imagen"] = "required|image|mimes:webp,jpeg,png,jpg,gif,svg|max:4096";
-        } else {
-            $rules["imagen"] = "required|string";
-        }
-
         return $rules;
     }
 
     public function messages()
     {
         return [
-            "nombre.required" => "Debes completar este campo",
-            "nombre.string" => "Debes ingresar una cadena",
-            "imagen.required" => "Debes completar este campo",
-            "imagen.mimes" => "Solo puedes cargar imagenes webp,jpeg,png,jpg,gif,svg",
-            "imagen.max" => "No puedes subir imagenes que pesen mas de 4MB"
+            "pagina_id.required" => "Debes completar este campo",
+            "productos.required" => "Debe existir al menos 1 producto",
+            "productos.array" => "Debe enviar una lista de productos",
+            "productos.min" => "Debe existir al menos :min producto",
+            "imagen.required" => "Debe cargar una imagen de fondo",
+            "imagen.mimes" => "Debes cargar solo imagenes webp,jpeg,jpg,png,gif,svg",
+            "imagen.max" => "La imagen no puede pesar mas de 4MB",
         ];
     }
 }

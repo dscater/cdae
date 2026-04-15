@@ -6,6 +6,7 @@ use App\Http\Controllers\IconoController;
 use App\Http\Controllers\InicioController;
 use App\Http\Controllers\PaginaCatalogoController;
 use App\Http\Controllers\PortalController;
+use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\SocialController;
@@ -17,14 +18,13 @@ use Inertia\Inertia;
 
 
 // portal
-Route::get('/productos/buscar', [CatalogoController::class, 'buscar'])->name('productos.buscar');
+Route::get('/productos/buscar', [ProductoController::class, 'buscar'])->name('productos.buscar');
 Route::get('/productos/miCatalogo', [PortalController::class, 'miCatalogo'])->name('portal.miCatalogo');
 Route::post('/productos/crearPedido', [PortalController::class, 'crearPedido'])->name('portal.crearPedido');
-Route::get('/productos/descargar_catalogo/{catalogo}', [PortalController::class, 'descargar_catalogo'])->name('portal.descargar_catalogo');
+Route::get('/productos/descargar_catalogo', [PortalController::class, 'descargar_catalogo'])->name('portal.descargar_catalogo');
 Route::middleware(['logVisitante'])->group(function () {
     Route::get('/', [PortalController::class, 'index'])->name('portal');
     Route::get('/productos/verProducto/{producto}', [PortalController::class, 'verProducto'])->name('portal.verProducto');
-    Route::get('/productos/{catalogo}', [PortalController::class, 'productos'])->name('portal.productos');
 });
 
 Route::get("configuracions/getConfiguracion", [ConfiguracionController::class, 'getConfiguracion'])->name("configuracions.getConfiguracion");
@@ -76,12 +76,11 @@ Route::middleware(['auth', 'permisoUsuario'])->prefix("admin")->group(function (
         ["index", "store", "edit", "show", "update", "destroy"]
     );
 
-
     // CATALOGOS
     Route::get("catalogos/paginado", [CatalogoController::class, 'paginado'])->name("catalogos.paginado");
     Route::get("catalogos/listado", [CatalogoController::class, 'listado'])->name("catalogos.listado");
     Route::resource("catalogos", CatalogoController::class)->only(
-        ["index", "store", "edit", "show", "update", "destroy"]
+        ["index", "create", "store", "edit", "show", "update", "destroy"]
     );
 
     // REDES SOCIALES

@@ -1,0 +1,28 @@
+.pagina1 {
+    display: block;
+    width: 100%;
+    background-color: green;
+    min-height: 60vh;
+}
+
+.pagina1 .producto {
+    display: flex;
+    padding: 0;
+}
+.cargar_archivo.imagen1 {
+    min-height: 400px;
+    width: 60%;
+}
+
+.cargar_archivo.imagen1 label {
+    width: 100%;
+    height: 100%;
+}
+
+.cargar_archivo.imagen1 label {
+    background-color: blue;
+}
+
+.pagina1 .nombre {
+    width: 40%;
+}

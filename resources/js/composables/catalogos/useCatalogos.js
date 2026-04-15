@@ -2,10 +2,10 @@ import { onMounted, ref } from "vue";
 
 const oCatalogo = ref({
     id: 0,
-    nombre: "",
-    tipo: "imagen",
+    pagina_id: "",
     imagen: "",
-    descargar: 1,
+    estado: 0,
+    productos: [],
     _method: "POST",
 });
 
@@ -13,9 +13,9 @@ export const useCatalogos = () => {
     const setCatalogo = (item = null) => {
         if (item) {
             oCatalogo.value.id = item.id;
-            oCatalogo.value.nombre = item.nombre;
-            oCatalogo.value.tipo = item.tipo;
-            oCatalogo.value.descargar = item.descargar;
+            oCatalogo.value.pagina_id = item.pagina_id;
+            oCatalogo.value.estado = item.estado;
+            oCatalogo.value.productos = item.productos;
             oCatalogo.value._method = "PUT";
             return oCatalogo;
         }
@@ -24,10 +24,9 @@ export const useCatalogos = () => {
 
     const limpiarCatalogo = () => {
         oCatalogo.value.id = 0;
-        oCatalogo.value.nombre = "";
-        oCatalogo.value.tipo = "imagen";
+        oCatalogo.value.pagina_id = "";
         oCatalogo.value.imagen = "";
-        oCatalogo.value.descargar = 1;
+        oCatalogo.value.estado = 0;
         oCatalogo.value._method = "POST";
     };
 
