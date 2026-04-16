@@ -1,4 +1,7 @@
 <script setup>
+import { watch, nextTick, onMounted } from "vue";
+import "aos/dist/aos.css";
+import AOS from "aos";
 const props = defineProps({
     productos: {
         type: Array,
@@ -10,6 +13,19 @@ const emits = defineEmits(["agregar"]);
 const agregarProducto = (item) => {
     emits("agregar", item);
 };
+
+onMounted(async () => {
+    AOS.init({
+        duration: 800,
+        easing: "ease-in-out",
+        mirror: false,
+        startEvent: "load", // inicia al cargar
+        once: true, // solo una vez
+        offset: 0, // sin esperar scroll
+    });
+    await nextTick();
+    AOS.refreshHard();
+});
 </script>
 <template>
     <div class="p1 pagina">
@@ -31,7 +47,12 @@ const agregarProducto = (item) => {
                             {{ productos[0].moneda }} {{ productos[0].precio }}
                         </div>
                         <div class="accion">
-                            <button @click="agregarProducto(productos[0])">
+                            <button
+                                @click="agregarProducto(productos[0])"
+                                data-aos="fade-up"
+                                data-aos-duration="600"
+                                data-aos-delay="200"
+                            >
                                 <i class="fa fa-cart-plus"></i>
                                 <span>Agregar</span>
                             </button>
@@ -62,7 +83,12 @@ const agregarProducto = (item) => {
                             {{ productos[1].moneda }} {{ productos[1].precio }}
                         </div>
                         <div class="accion">
-                            <button @click="agregarProducto(productos[1])">
+                            <button
+                                @click="agregarProducto(productos[1])"
+                                data-aos="fade-up"
+                                data-aos-duration="600"
+                                data-aos-delay="200"
+                            >
                                 <i class="fa fa-cart-plus"></i>
                                 <span>Agregar</span>
                             </button>
@@ -80,7 +106,12 @@ const agregarProducto = (item) => {
                             {{ productos[2].moneda }} {{ productos[2].precio }}
                         </div>
                         <div class="accion">
-                            <button @click="agregarProducto(productos[2])">
+                            <button
+                                @click="agregarProducto(productos[2])"
+                                data-aos="fade-up"
+                                data-aos-duration="600"
+                                data-aos-delay="200"
+                            >
                                 <i class="fa fa-cart-plus"></i>
                                 <span>Agregar</span>
                             </button>
@@ -98,7 +129,12 @@ const agregarProducto = (item) => {
                             {{ productos[3].moneda }} {{ productos[3].precio }}
                         </div>
                         <div class="accion">
-                            <button @click="agregarProducto(productos[3])">
+                            <button
+                                @click="agregarProducto(productos[3])"
+                                data-aos="fade-up"
+                                data-aos-duration="600"
+                                data-aos-delay="200"
+                            >
                                 <i class="fa fa-cart-plus"></i>
                                 <span>Agregar</span>
                             </button>
@@ -132,7 +168,12 @@ const agregarProducto = (item) => {
                                 {{ productos[4].precio }}
                             </div>
                             <div class="accion">
-                                <button @click="agregarProducto(productos[4])">
+                                <button
+                                    @click="agregarProducto(productos[4])"
+                                    data-aos="fade-up"
+                                    data-aos-duration="600"
+                                    data-aos-delay="200"
+                                >
                                     <i class="fa fa-cart-plus"></i>
                                     <span>Agregar</span>
                                 </button>

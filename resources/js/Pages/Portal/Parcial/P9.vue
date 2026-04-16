@@ -1,4 +1,7 @@
 <script setup>
+import { watch, nextTick, onMounted } from "vue";
+import "aos/dist/aos.css";
+import AOS from "aos";
 import { useSocialStore } from "@/stores/social/socialStore";
 const socialStore = useSocialStore();
 const props = defineProps({
@@ -13,6 +16,24 @@ const formatUrl = (url) => {
     if (!url) return "#";
     return url.startsWith("http") ? url : `https://${url}`;
 };
+
+const emits = defineEmits(["agregar"]);
+const agregarProducto = (item) => {
+    emits("agregar", item);
+};
+
+onMounted(async () => {
+    AOS.init({
+        duration: 800,
+        easing: "ease-in-out",
+        mirror: false,
+        startEvent: "load", // inicia al cargar
+        once: true, // solo una vez
+        offset: 0, // sin esperar scroll
+    });
+    await nextTick();
+    AOS.refreshHard();
+});
 </script>
 <template>
     <div class="p9 pagina">
@@ -42,7 +63,12 @@ const formatUrl = (url) => {
                             {{ productos[0].moneda }} {{ productos[0].precio }}
                         </div>
                         <div class="accion">
-                            <button @click="alert('asdasd')">
+                            <button
+                                @click="agregarProducto(productos[0])"
+                                data-aos="fade-up"
+                                data-aos-duration="600"
+                                data-aos-delay="200"
+                            >
                                 <i class="fa fa-cart-plus"></i>
                                 <span>Agregar</span>
                             </button>
@@ -60,7 +86,12 @@ const formatUrl = (url) => {
                             {{ productos[1].moneda }} {{ productos[1].precio }}
                         </div>
                         <div class="accion">
-                            <button @click="alert('asdasd')">
+                            <button
+                                @click="agregarProducto(productos[1])"
+                                data-aos="fade-up"
+                                data-aos-duration="600"
+                                data-aos-delay="200"
+                            >
                                 <i class="fa fa-cart-plus"></i>
                                 <span>Agregar</span>
                             </button>
@@ -78,7 +109,12 @@ const formatUrl = (url) => {
                             {{ productos[2].moneda }} {{ productos[2].precio }}
                         </div>
                         <div class="accion">
-                            <button @click="alert('asdasd')">
+                            <button
+                                @click="agregarProducto(productos[2])"
+                                data-aos="fade-up"
+                                data-aos-duration="600"
+                                data-aos-delay="200"
+                            >
                                 <i class="fa fa-cart-plus"></i>
                                 <span>Agregar</span>
                             </button>
@@ -109,7 +145,12 @@ const formatUrl = (url) => {
                             {{ productos[3].moneda }} {{ productos[3].precio }}
                         </div>
                         <div class="accion">
-                            <button @click="alert('asdasd')">
+                            <button
+                                @click="agregarProducto(productos[3])"
+                                data-aos="fade-up"
+                                data-aos-duration="600"
+                                data-aos-delay="200"
+                            >
                                 <i class="fa fa-cart-plus"></i>
                                 <span>Agregar</span>
                             </button>
@@ -127,7 +168,12 @@ const formatUrl = (url) => {
                             {{ productos[4].moneda }} {{ productos[4].precio }}
                         </div>
                         <div class="accion">
-                            <button @click="alert('asdasd')">
+                            <button
+                                @click="agregarProducto(productos[4])"
+                                data-aos="fade-up"
+                                data-aos-duration="600"
+                                data-aos-delay="200"
+                            >
                                 <i class="fa fa-cart-plus"></i>
                                 <span>Agregar</span>
                             </button>
@@ -145,7 +191,12 @@ const formatUrl = (url) => {
                             {{ productos[5].moneda }} {{ productos[5].precio }}
                         </div>
                         <div class="accion">
-                            <button @click="alert('asdasd')">
+                            <button
+                                @click="agregarProducto(productos[5])"
+                                data-aos="fade-up"
+                                data-aos-duration="600"
+                                data-aos-delay="200"
+                            >
                                 <i class="fa fa-cart-plus"></i>
                                 <span>Agregar</span>
                             </button>
@@ -176,7 +227,12 @@ const formatUrl = (url) => {
                             {{ productos[6].moneda }} {{ productos[6].precio }}
                         </div>
                         <div class="accion">
-                            <button @click="alert('asdasd')">
+                            <button
+                                @click="agregarProducto(productos[6])"
+                                data-aos="fade-up"
+                                data-aos-duration="600"
+                                data-aos-delay="200"
+                            >
                                 <i class="fa fa-cart-plus"></i>
                                 <span>Agregar</span>
                             </button>
@@ -194,7 +250,12 @@ const formatUrl = (url) => {
                             {{ productos[7].moneda }} {{ productos[7].precio }}
                         </div>
                         <div class="accion">
-                            <button @click="alert('asdasd')">
+                            <button
+                                @click="agregarProducto(productos[7])"
+                                data-aos="fade-up"
+                                data-aos-duration="600"
+                                data-aos-delay="200"
+                            >
                                 <i class="fa fa-cart-plus"></i>
                                 <span>Agregar</span>
                             </button>
@@ -212,7 +273,12 @@ const formatUrl = (url) => {
                             {{ productos[8].moneda }} {{ productos[8].precio }}
                         </div>
                         <div class="accion">
-                            <button @click="alert('asdasd')">
+                            <button
+                                @click="agregarProducto(productos[8])"
+                                data-aos="fade-up"
+                                data-aos-duration="600"
+                                data-aos-delay="200"
+                            >
                                 <i class="fa fa-cart-plus"></i>
                                 <span>Agregar</span>
                             </button>
