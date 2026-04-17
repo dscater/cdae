@@ -77,6 +77,7 @@ Route::middleware(['auth', 'permisoUsuario'])->prefix("admin")->group(function (
     );
 
     // CATALOGOS
+    Route::delete("catalogos/eliminarFondo/{catalogo}", [CatalogoController::class, 'eliminarFondo'])->name("catalogos.eliminarFondo");
     Route::get("catalogos/paginado", [CatalogoController::class, 'paginado'])->name("catalogos.paginado");
     Route::get("catalogos/listado", [CatalogoController::class, 'listado'])->name("catalogos.listado");
     Route::resource("catalogos", CatalogoController::class)->only(

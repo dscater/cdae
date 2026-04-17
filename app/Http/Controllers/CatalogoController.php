@@ -202,4 +202,27 @@ class CatalogoController extends Controller
             ]);
         }
     }
+
+    public function eliminarFondo(Catalogo $catalogo)
+    {
+        DB::beginTransaction();
+        try {
+            $imagen = $catalogo->imagen;
+            $catalogo->imagen = null;
+            $catalogo->save();
+            if ($imagen) {
+                \File::delete(public_path("imgs/catalogos/" . $imagen));
+            }
+            DB::commit();
+            return response()->JSON([
+                'sw' => true,
+                'message' => 'Se eliminó correctamente'
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw ValidationException::withMessages([
+                'error' =>  $e->getMessage(),
+            ]);
+        }
+    }
 }

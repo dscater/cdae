@@ -31,6 +31,7 @@ watch(
                 .getElementsByTagName("body")[0]
                 .classList.add("modal-open");
         } else {
+            oAgregar.value.cantidad = 1;
             document
                 .getElementsByTagName("body")[0]
                 .classList.remove("modal-open");
@@ -71,6 +72,16 @@ watch(muestra_form, (newVal) => {
     }
 });
 
+const disminuir = () => {
+    if (oAgregar.value.cantidad < 2) {
+        return;
+    }
+    oAgregar.value.cantidad--;
+};
+const aumentar = () => {
+    oAgregar.value.cantidad++;
+};
+
 const cerrarFormulario = () => {
     muestra_form.value = false;
     document.getElementsByTagName("body")[0].classList.remove("modal-open");
@@ -83,7 +94,7 @@ onMounted(() => {});
     <MiModal
         :open_modal="muestra_form"
         @close="cerrarFormulario"
-        :size="'modal-xl'"
+        :size="''"
         :header-class="'bg-principal'"
         :footer-class="'justify-content-end'"
     >
@@ -120,12 +131,30 @@ onMounted(() => {});
                     </div>
                     <div class="col-md-12 mt-2">
                         <label>Cantidad</label>
-                        <input
-                            type="number"
-                            step="1"
-                            class="form-control text-center"
-                            v-model="oAgregar.cantidad"
-                        />
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <button
+                                    class="btn btn-default"
+                                    @click.prevent="disminuir"
+                                >
+                                    -
+                                </button>
+                            </div>
+                            <input
+                                type="number"
+                                step="1"
+                                class="form-control text-center"
+                                v-model="oAgregar.cantidad"
+                            />
+                            <div class="input-group-append">
+                                <button
+                                    class="btn btn-default"
+                                    @click.prevent="aumentar"
+                                >
+                                    +
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </form>

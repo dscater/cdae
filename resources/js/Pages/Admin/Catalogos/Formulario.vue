@@ -9,8 +9,11 @@ import {
     nextTick,
     onBeforeMount,
 } from "vue";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 import Formulario from "../PaginaCatalogos/Formulario.vue";
 import { usePaginaCatalogos } from "@/composables/pagina_catalogos/usePaginaCatalogos";
+import { Toast } from "bootstrap";
 const { oPaginaCatalogo, setPaginaCatalogo, limpiarPaginaCatalogo } =
     usePaginaCatalogos();
 const props = defineProps({
@@ -181,6 +184,34 @@ const agregarProducto = () => {
     });
 };
 
+const eliminarFondo = () => {
+    Swal.fire({
+        title: "¿Quierés eliminar el fondo?",
+        html: ``,
+        showCancelButton: true,
+        confirmButtonText: "Si, eliminar",
+        cancelButtonText: "No, cancelar",
+        denyButtonText: `No, cancelar`,
+        customClass: {
+            confirmButton: "btn-danger",
+        },
+    }).then(async (result) => {
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed) {
+            axios
+                .delete(route("catalogos.eliminarFondo", form.id))
+                .then((response) => {
+                    form.imagen = null;
+                    form.url_imagen = "";
+                    toast.success("Proceso realizado");
+                })
+                .catch((error) => {
+                    toast.error("Ocurrio un problema no se pudo eliminar");
+                });
+        }
+    });
+};
+
 onBeforeMount(() => {
     cargarCatalogoPaginas();
 });
@@ -274,9 +305,16 @@ onMounted(() => {});
                                     "
                                 />
                             </div>
-                            <div class="col-md-5 mt-2">
-                                <label class="required">Imagen de Fondo</label
-                                ><small class="text-muted"
+                            <div class="col-md-12 mt-2">
+                                <label class="required">Imagen de Fondo</label>
+                                <button
+                                    class="btn btn-sm text-xs btn-danger mx-2"
+                                    v-if="form.imagen"
+                                    @click.prevent="eliminarFondo"
+                                >
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                                <small class="text-muted"
                                     >(Tamaño recomendado: A4)</small
                                 >
                                 <input

@@ -1,7 +1,5 @@
 <script setup>
 import { watch, nextTick, onMounted } from "vue";
-import "aos/dist/aos.css";
-import AOS from "aos";
 const props = defineProps({
     productos: {
         type: Array,
@@ -14,18 +12,7 @@ const agregarProducto = (item) => {
     emits("agregar", item);
 };
 
-onMounted(async () => {
-    AOS.init({
-        duration: 800,
-        easing: "ease-in-out",
-        mirror: false,
-        startEvent: "load", // inicia al cargar
-        once: true, // solo una vez
-        offset: 0, // sin esperar scroll
-    });
-    await nextTick();
-    AOS.refreshHard();
-});
+onMounted(async () => {});
 </script>
 <template>
     <div class="p6 pagina">
@@ -70,12 +57,7 @@ onMounted(async () => {
                                 {{ productos[0].precio }}
                             </div>
                             <div class="accion">
-                                <button
-                                    @click="agregarProducto(productos[0])"
-                                    data-aos="fade-up"
-                                    data-aos-duration="600"
-                                    data-aos-delay="200"
-                                >
+                                <button @click="agregarProducto(productos[0])">
                                     <i class="fa fa-cart-plus"></i>
                                     <span>Agregar</span>
                                 </button>
@@ -111,12 +93,7 @@ onMounted(async () => {
                                 {{ productos[1].precio }}
                             </div>
                             <div class="accion">
-                                <button
-                                    @click="agregarProducto(productos[1])"
-                                    data-aos="fade-up"
-                                    data-aos-duration="600"
-                                    data-aos-delay="200"
-                                >
+                                <button @click="agregarProducto(productos[1])">
                                     <i class="fa fa-cart-plus"></i>
                                     <span>Agregar</span>
                                 </button>
@@ -149,12 +126,7 @@ onMounted(async () => {
                             {{ productos[2].moneda }} {{ productos[2].precio }}
                         </div>
                         <div class="accion">
-                            <button
-                                @click="agregarProducto(productos[2])"
-                                data-aos="fade-up"
-                                data-aos-duration="600"
-                                data-aos-delay="200"
-                            >
+                            <button @click="agregarProducto(productos[2])">
                                 <i class="fa fa-cart-plus"></i>
                                 <span>Agregar</span>
                             </button>
