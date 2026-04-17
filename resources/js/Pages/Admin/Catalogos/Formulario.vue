@@ -306,7 +306,7 @@ onMounted(() => {});
                                 />
                             </div>
                             <div class="col-md-12 mt-2">
-                                <label class="required">Imagen de Fondo</label>
+                                <label class="">Imagen de Fondo</label>
                                 <button
                                     class="btn btn-sm text-xs btn-danger mx-2"
                                     v-if="form.imagen"

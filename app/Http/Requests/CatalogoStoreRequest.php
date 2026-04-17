@@ -25,7 +25,7 @@ class CatalogoStoreRequest extends FormRequest
         $rules = [
             "pagina_id" => "required",
             "estado" => "required",
-            "imagen" => "required|image|mimes:webp,jpeg,png,jpg,gif,svg|max:4096",
+            "imagen" => "nullable|image|mimes:webp,jpeg,png,jpg,gif,svg|max:4096",
             "productos" => ["required", "array", "min:1", new CatalogoProductosRule()]
         ];
         return $rules;
