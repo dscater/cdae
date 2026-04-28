@@ -12,16 +12,11 @@ use PDF;
 
 class PortalController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $page = $request->page ?? 1;
-        $page = is_string($page) ? (int)$page : $page;
-        $catalogos = Catalogo::where("estado", 1)
-            ->with(["pagina_catalogo:id,pagina", "productos.producto_descripcions"])->paginate(1);
-
         $listCatalogos = Catalogo::with(["pagina_catalogo:id,pagina", "productos.producto_descripcions"])->where("estado", 1)->get();
 
-        return inertia("Portal/Inicio", compact("catalogos", "page", "listCatalogos"));
+        return inertia("Portal/Inicio", compact("listCatalogos"));
     }
 
     public function verProducto(Producto $producto)

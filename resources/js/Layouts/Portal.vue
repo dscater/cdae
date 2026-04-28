@@ -1,8 +1,21 @@
 <script setup>
 // includes
-import { ref, onMounted, onBeforeMount, watch } from "vue";
+import { ref, onMounted, onBeforeMount, watch, computed } from "vue";
 import { Link, router, usePage } from "@inertiajs/vue3";
 import { useConfiguracionStore } from "@/stores/configuracion/configuracionStore";
+import { useFlipbook } from "@/composables/useFlipbook";
+import Compartir from "@/Pages/Portal/Compartir.vue";
+import { usePdf } from "@/composables/usePdf";
+const { exportPdf } = usePdf();
+const {
+    currentPage,
+    lastPage,
+    next,
+    prev,
+    setLastPage,
+    setCurrentPage,
+    uiPage,
+} = useFlipbook();
 const configuracionStore = useConfiguracionStore();
 import { useSocialStore } from "@/stores/social/socialStore";
 const socialStore = useSocialStore();
@@ -37,6 +50,14 @@ const onSearch = () => {
     }, 270);
 };
 
+const muestra_compartir = ref(false);
+const accion_compartir = ref(0);
+const url_catalogo = ref("");
+const compartirCatalogo = () => {
+    muestra_compartir.value = true;
+    url_catalogo.value = route("portal");
+};
+
 onMounted(() => {
     configuracionStore.initConfiguracion();
     socialStore.initSocial();
@@ -67,6 +88,46 @@ onBeforeMount(() => {});
                     />
                     {{ configuracionStore.oConfiguracion.alias }}</Link
                 >
+                <div class="paginacion_descarga">
+                    <div class="paginacion">
+                        <input
+                            type="text"
+                            v-model="uiPage"
+                            class="nro_pagina"
+                        />
+                        /
+                        {{ lastPage }}
+                    </div>
+                    <div class="descarga">
+                        <el-tooltip
+                            class="box-item"
+                            effect="dark"
+                            content="Compartir Catálogo"
+                            placement="bottom-start"
+                        >
+                            <a
+                                href="#"
+                                class="text-dark"
+                                @click.prevent="compartirCatalogo"
+                                ><i class="fa fa-share-alt"></i
+                            ></a>
+                        </el-tooltip>
+                        <el-tooltip
+                            class="box-item"
+                            effect="dark"
+                            content="Descargar Catálogo"
+                            placement="bottom-start"
+                        >
+                            <a
+                                href="#"
+                                @click.prevent="exportPdf"
+                                class="text-dark"
+                            >
+                                <i class="fa fa-download"></i>
+                            </a>
+                        </el-tooltip>
+                    </div>
+                </div>
                 <button
                     class="navbar-toggler"
                     type="button"
@@ -78,10 +139,7 @@ onBeforeMount(() => {});
                 >
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div
-                    class="collapse navbar-collapse justify-content-end"
-                    id="navbarNav"
-                >
+                <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav">
                         <li class="nav-item">
                             <Link
@@ -170,6 +228,13 @@ onBeforeMount(() => {});
                 </div>
             </div>
         </nav>
+
+        <Compartir
+            :accion_formulario="accion_compartir"
+            :muestra_formulario="muestra_compartir"
+            :url_compartir="url_catalogo"
+            @cerrar-formulario="muestra_compartir = false"
+        ></Compartir>
         <slot></slot>
 
         <!-- REDES SOCIALES -->
@@ -268,3 +333,31 @@ onBeforeMount(() => {});
         </div>
     </div>
 </template>
+<style scoped>
+.paginacion_descarga {
+    flex: 2;
+    justify-content: end;
+    align-items: end;
+    text-align: right;
+    display: flex;
+    gap: 0px 25px;
+    margin-right: 1.4rem;
+}
+
+.paginacion input {
+    border: none;
+    background-color: transparent;
+}
+
+.descarga {
+    display: flex;
+    gap: 0px 15px;
+}
+
+.descarga a {
+    font-size: 1.2em;
+}
+
+.collapse.navbar-collapse {
+}
+</style>

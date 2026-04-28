@@ -10,12 +10,16 @@ import {
     ref,
     watch,
 } from "vue";
+import { usePdf } from "@/composables/usePdf";
+const { triggerExport } = usePdf();
+import { useFlipbook } from "@/composables/useFlipbook";
+const { currentPage, next, prev, setLastPage, setCurrentPage, setTotal } =
+    useFlipbook();
 defineOptions({ layout: Portal });
 
 // TOAST
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
-import Compartir from "./Compartir.vue";
 import { useCatalogoStore } from "@/stores/catalogo/catalogoStore";
 import Agregar from "./Agregar.vue";
 const catalogoStore = useCatalogoStore();
@@ -32,80 +36,39 @@ import P9 from "./Parcial/P9.vue";
 import html2pdf from "html2pdf.js";
 const configuracionStore = useConfiguracionStore();
 const propsPage = usePage().props;
-const url_assets = ref(propsPage.url_assets);
 
 const props = defineProps({
-    catalogos: Object,
-    page: {
-        type: Number,
-        default: 1,
-    },
     listCatalogos: {
         type: Array,
         default: [],
     },
 });
 
-const oCatalogo = ref({});
-const paginaInput = ref(1);
-const currentPage = computed(() => {
-    paginaInput.value = Number(props.catalogos.current_page);
-    return Number(props.catalogos.current_page);
+watch(triggerExport, async () => {
+    await generarPdf();
 });
-const lastPage = computed(() => props.catalogos.last_page);
-watch(
-    () => props.catalogos,
-    (newValue) => {
-        if (newValue.data.length > 0) {
-            oCatalogo.value = newValue.data[0];
-        }
-    },
-);
 
-const siguiente = () => {
-    if (props.catalogos.current_page < props.catalogos.last_page) {
-        cambiarPagina(props.catalogos.current_page + 1);
-    }
-};
+const visibleItems = computed(() => {
+    const total = props.listCatalogos.length;
 
-const anterior = () => {
-    if (props.catalogos.current_page > 1) {
-        cambiarPagina(props.catalogos.current_page - 1);
-    }
-};
+    if (!total) return [];
 
-const inicio = () => cambiarPagina(1);
-const final = () => cambiarPagina(props.catalogos.last_page);
+    const prevIndex = (currentPage.value - 1 + total) % total;
+    const currentIndex = currentPage.value % total;
+    const nextIndex = (currentPage.value + 1) % total;
 
-const cambiarPagina = (pagina) => {
-    router.get(
-        route("portal"),
-        {
-            page: pagina,
-        },
-        {
-            preserveState: true,
-            replace: true,
-        },
-    );
-};
-
-const setIntervalOutPagina = ref(null);
-const modificarPaginaInput = () => {
-    clearInterval(setIntervalOutPagina.value);
-    if (
-        paginaInput.value &&
-        paginaInput.value > 0 &&
-        paginaInput.value < lastPage
-    ) {
-        setIntervalOutPagina.value = setTimeout(() => {
-            cambiarPagina(paginaInput.value ?? 1);
-        }, 170);
-    }
-};
+    return [
+        props.listCatalogos[prevIndex],
+        props.listCatalogos[currentIndex],
+        props.listCatalogos[nextIndex],
+    ];
+});
+const lastPage = computed(() => {
+    return Number(props.listCatalogos.length - 1);
+});
 
 // DRAG SWIPE
-const totalPages = 5;
+const screenWidth = ref(0);
 const startX = ref(0);
 const diffX = ref(0);
 const isDragging = ref(false);
@@ -137,12 +100,12 @@ const handleMove = (e) => {
 const handleEnd = () => {
     if (!isDragging.value) return;
 
-    const threshold = 20; // Sensibilidad
+    const threshold = 110; // Sensibilidad
 
     if (diffX.value > threshold) {
-        anterior();
+        prev();
     } else if (diffX.value < -threshold) {
-        siguiente();
+        next();
     }
 
     // Limpieza
@@ -156,16 +119,18 @@ const handleEnd = () => {
     window.removeEventListener("touchend", handleEnd);
 };
 
-const muestra_compartir = ref(false);
-const accion_compartir = ref(0);
-const url_catalogo = ref("");
-const compartirCatalogo = () => {
-    muestra_compartir.value = true;
-    url_catalogo.value = route("portal");
+const updateWidth = () => {
+    screenWidth.value = window.innerWidth;
 };
-
 onMounted(() => {
-    oCatalogo.value = props.catalogos.data[0];
+    updateWidth();
+    setTotal(props.listCatalogos.length);
+    setLastPage(props.listCatalogos.length);
+    window.addEventListener("resize", updateWidth);
+});
+
+onUnmounted(() => {
+    window.removeEventListener("resize", updateWidth);
 });
 
 const listPedido = computed(() => catalogoStore.getListaProductos());
@@ -181,8 +146,10 @@ const enviadoAgregar = () => {
     muestra_agregar.value = false;
 };
 
-const exportarPDF = async () => {
+const generarPdf = async () => {
     const container = document.getElementById("pdf-container");
+
+    if (!container) return;
 
     // Mostrar temporalmente
     container.style.display = "block";
@@ -228,57 +195,8 @@ onUnmounted(() => handleEnd());
         ></Agregar>
         <div class="row">
             <div class="col-12 mt-3">
-                <Compartir
-                    :accion_formulario="accion_compartir"
-                    :muestra_formulario="muestra_compartir"
-                    :url_compartir="url_catalogo"
-                    @cerrar-formulario="muestra_compartir = false"
-                ></Compartir>
-                <div class="mx-auto col-md-9 text-center">
-                    Página
-                    <input
-                        type="text"
-                        v-model="paginaInput"
-                        class="nro_pagina"
-                        @keyup="modificarPaginaInput"
-                    />
-                    de
-                    {{ lastPage }}
-                </div>
-                <div
-                    class="mx-auto col-md-9 text-center d-flex justify-content-center text-lg"
-                    style="gap: 20px"
-                >
-                    <el-tooltip
-                        class="box-item"
-                        effect="dark"
-                        content="Compartir Catálogo"
-                        placement="bottom-start"
-                    >
-                        <a
-                            href="#"
-                            class="text-dark"
-                            @click.prevent="compartirCatalogo"
-                            ><i class="fa fa-share-alt"></i
-                        ></a>
-                    </el-tooltip>
-                    <el-tooltip
-                        class="box-item"
-                        effect="dark"
-                        content="Descargar Catálogo"
-                        placement="bottom-start"
-                    >
-                        <a
-                            href="#"
-                            @click.prevent="exportarPDF"
-                            class="text-dark"
-                        >
-                            <i class="fa fa-download"></i>
-                        </a>
-                    </el-tooltip>
-                </div>
                 <div class="menu_inicio">
-                    <div class="contenedor_producto">
+                    <div class="contenedor_principal">
                         <div class="pagina_inicio" v-if="currentPage > 1">
                             <el-tooltip
                                 class="box-item"
@@ -287,7 +205,7 @@ onUnmounted(() => handleEnd());
                                 placement="left-start"
                                 ><i
                                     class="fa fa-angle-double-left"
-                                    @click="inicio"
+                                    @click="setCurrentPage(0)"
                                 ></i
                             ></el-tooltip>
                         </div>
@@ -298,10 +216,7 @@ onUnmounted(() => handleEnd());
                                 content="Anterior"
                                 placement="left-start"
                             >
-                                <i
-                                    class="fa fa-angle-left"
-                                    @click="anterior"
-                                ></i>
+                                <i class="fa fa-angle-left" @click="prev"></i>
                             </el-tooltip>
                         </div>
                         <div
@@ -314,10 +229,7 @@ onUnmounted(() => handleEnd());
                                 content="Siguiente"
                                 placement="right-start"
                             >
-                                <i
-                                    class="fa fa-angle-right"
-                                    @click="siguiente"
-                                ></i
+                                <i class="fa fa-angle-right" @click="next"></i
                             ></el-tooltip>
                         </div>
                         <div
@@ -332,129 +244,179 @@ onUnmounted(() => handleEnd());
                             >
                                 <i
                                     class="fa fa-angle-double-right"
-                                    @click="final"
+                                    @click="setCurrentPage(lastPage)"
                                 ></i>
                             </el-tooltip>
                         </div>
-                        <div
-                            class="producto"
-                            :style="{
-                                backgroundImage: `url(${oCatalogo?.url_imagen})`,
-                                backgroundSize: '100% 100%',
-                                backgroundRepeat: 'no-repeat',
-                                backgroundPosition: 'center',
-                            }"
-                        >
-                            <P1
-                                v-if="oCatalogo?.pagina_catalogo?.pagina == 1"
-                                @agregar="agregarAlPedido"
-                                :productos="oCatalogo.productos"
-                            ></P1>
-                            <P2
-                                v-if="oCatalogo?.pagina_catalogo?.pagina == 2"
-                                @agregar="agregarAlPedido"
-                                :productos="oCatalogo.productos"
-                            ></P2>
-                            <P3
-                                v-if="oCatalogo?.pagina_catalogo?.pagina == 3"
-                                @agregar="agregarAlPedido"
-                                :productos="oCatalogo.productos"
-                            ></P3>
-                            <P4
-                                v-if="oCatalogo?.pagina_catalogo?.pagina == 4"
-                                @agregar="agregarAlPedido"
-                                :productos="oCatalogo.productos"
-                            ></P4>
-                            <P5
-                                v-if="oCatalogo?.pagina_catalogo?.pagina == 5"
-                                @agregar="agregarAlPedido"
-                                :productos="oCatalogo.productos"
-                            ></P5>
-                            <P6
-                                v-if="oCatalogo?.pagina_catalogo?.pagina == 6"
-                                @agregar="agregarAlPedido"
-                                :productos="oCatalogo.productos"
-                            ></P6>
-                            <P7
-                                v-if="oCatalogo?.pagina_catalogo?.pagina == 7"
-                                @agregar="agregarAlPedido"
-                                :productos="oCatalogo.productos"
-                            ></P7>
-                            <P8
-                                v-if="oCatalogo?.pagina_catalogo?.pagina == 8"
-                                @agregar="agregarAlPedido"
-                                :productos="oCatalogo.productos"
-                            ></P8>
-                            <P9
-                                v-if="oCatalogo?.pagina_catalogo?.pagina == 9"
-                                @agregar="agregarAlPedido"
-                                :productos="oCatalogo.productos"
-                            ></P9>
+                        <div class="contenedor_producto">
                             <div
-                                class="capa"
-                                @mousedown="handleStart"
-                                @touchstart="handleStart"
-                            ></div>
+                                v-for="(currentItem, i) in visibleItems"
+                                :key="currentItem.id"
+                                class="producto con_animacion"
+                                :style="{
+                                    transform: `translateX(${(i - 1) * 100 + (diffX / screenWidth) * 100}%)`,
+                                    transition: isDragging
+                                        ? 'none'
+                                        : 'transform 0.35s ease',
+                                    backgroundImage: `url(${currentItem?.url_imagen})`,
+                                    backgroundSize: '100% 100%',
+                                    backgroundRepeat: 'no-repeat',
+                                    backgroundPosition: 'center',
+                                }"
+                            >
+                                <P1
+                                    v-if="
+                                        currentItem?.pagina_catalogo?.pagina ==
+                                        1
+                                    "
+                                    @agregar="agregarAlPedido"
+                                    :productos="currentItem.productos"
+                                ></P1>
+                                <P2
+                                    v-if="
+                                        currentItem?.pagina_catalogo?.pagina ==
+                                        2
+                                    "
+                                    @agregar="agregarAlPedido"
+                                    :productos="currentItem.productos"
+                                ></P2>
+                                <P3
+                                    v-if="
+                                        currentItem?.pagina_catalogo?.pagina ==
+                                        3
+                                    "
+                                    @agregar="agregarAlPedido"
+                                    :productos="currentItem.productos"
+                                ></P3>
+                                <P4
+                                    v-if="
+                                        currentItem?.pagina_catalogo?.pagina ==
+                                        4
+                                    "
+                                    @agregar="agregarAlPedido"
+                                    :productos="currentItem.productos"
+                                ></P4>
+                                <P5
+                                    v-if="
+                                        currentItem?.pagina_catalogo?.pagina ==
+                                        5
+                                    "
+                                    @agregar="agregarAlPedido"
+                                    :productos="currentItem.productos"
+                                ></P5>
+                                <P6
+                                    v-if="
+                                        currentItem?.pagina_catalogo?.pagina ==
+                                        6
+                                    "
+                                    @agregar="agregarAlPedido"
+                                    :productos="currentItem.productos"
+                                ></P6>
+                                <P7
+                                    v-if="
+                                        currentItem?.pagina_catalogo?.pagina ==
+                                        7
+                                    "
+                                    @agregar="agregarAlPedido"
+                                    :productos="currentItem.productos"
+                                ></P7>
+                                <P8
+                                    v-if="
+                                        currentItem?.pagina_catalogo?.pagina ==
+                                        8
+                                    "
+                                    @agregar="agregarAlPedido"
+                                    :productos="currentItem.productos"
+                                ></P8>
+                                <P9
+                                    v-if="
+                                        currentItem?.pagina_catalogo?.pagina ==
+                                        9
+                                    "
+                                    @agregar="agregarAlPedido"
+                                    :productos="currentItem.productos"
+                                ></P9>
+                                <div
+                                    class="capa"
+                                    @mousedown="handleStart"
+                                    @touchstart="handleStart"
+                                ></div>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                <div id="pdf-container" style="display: none">
-                    <template v-for="catalogo in listCatalogos">
-                        <div
-                            class="producto"
-                            :style="{
-                                backgroundImage: `url(${catalogo?.url_imagen})`,
-                                backgroundSize: '100% 100%',
-                                backgroundRepeat: 'no-repeat',
-                                backgroundPosition: 'center',
-                            }"
-                        >
-                            <P1
-                                v-if="catalogo?.pagina_catalogo?.pagina == 1"
-                                :productos="catalogo.productos"
-                            ></P1>
-                            <P2
-                                v-if="catalogo?.pagina_catalogo?.pagina == 2"
-                                :productos="catalogo.productos"
-                            ></P2>
-                            <P3
-                                v-if="catalogo?.pagina_catalogo?.pagina == 3"
-                                :productos="catalogo.productos"
-                            ></P3>
-                            <P4
-                                v-if="catalogo?.pagina_catalogo?.pagina == 4"
-                                :productos="catalogo.productos"
-                            ></P4>
-                            <P5
-                                v-if="catalogo?.pagina_catalogo?.pagina == 5"
-                                :productos="catalogo.productos"
-                            ></P5>
-                            <P6
-                                v-if="catalogo?.pagina_catalogo?.pagina == 6"
-                                :productos="catalogo.productos"
-                            ></P6>
-                            <P7
-                                v-if="catalogo?.pagina_catalogo?.pagina == 7"
-                                :productos="catalogo.productos"
-                            ></P7>
-                            <P8
-                                v-if="catalogo?.pagina_catalogo?.pagina == 8"
-                                :productos="catalogo.productos"
-                            ></P8>
-                            <P9
-                                v-if="catalogo?.pagina_catalogo?.pagina == 9"
-                                :productos="catalogo.productos"
-                            ></P9>
+                <div id="pdf-container">
+                    <div class="contenedor_producto_imp">
+                        <template v-for="catalogo in listCatalogos">
                             <div
-                                class="capa"
-                                @mousedown="handleStart"
-                                @touchstart="handleStart"
-                            ></div>
-                        </div>
-                    </template>
+                                class="producto"
+                                :style="{
+                                    backgroundImage: `url(${catalogo?.url_imagen})`,
+                                    backgroundSize: '100% 100%',
+                                    backgroundRepeat: 'no-repeat',
+                                    backgroundPosition: 'center',
+                                }"
+                            >
+                                <P1
+                                    v-if="
+                                        catalogo?.pagina_catalogo?.pagina == 1
+                                    "
+                                    :productos="catalogo.productos"
+                                ></P1>
+                                <P2
+                                    v-if="
+                                        catalogo?.pagina_catalogo?.pagina == 2
+                                    "
+                                    :productos="catalogo.productos"
+                                ></P2>
+                                <P3
+                                    v-if="
+                                        catalogo?.pagina_catalogo?.pagina == 3
+                                    "
+                                    :productos="catalogo.productos"
+                                ></P3>
+                                <P4
+                                    v-if="
+                                        catalogo?.pagina_catalogo?.pagina == 4
+                                    "
+                                    :productos="catalogo.productos"
+                                ></P4>
+                                <P5
+                                    v-if="
+                                        catalogo?.pagina_catalogo?.pagina == 5
+                                    "
+                                    :productos="catalogo.productos"
+                                ></P5>
+                                <P6
+                                    v-if="
+                                        catalogo?.pagina_catalogo?.pagina == 6
+                                    "
+                                    :productos="catalogo.productos"
+                                ></P6>
+                                <P7
+                                    v-if="
+                                        catalogo?.pagina_catalogo?.pagina == 7
+                                    "
+                                    :productos="catalogo.productos"
+                                ></P7>
+                                <P8
+                                    v-if="
+                                        catalogo?.pagina_catalogo?.pagina == 8
+                                    "
+                                    :productos="catalogo.productos"
+                                ></P8>
+                                <P9
+                                    v-if="
+                                        catalogo?.pagina_catalogo?.pagina == 9
+                                    "
+                                    :productos="catalogo.productos"
+                                ></P9>
+                            </div>
+                        </template>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </template>
+<style scoped></style>

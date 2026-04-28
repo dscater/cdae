@@ -310,23 +310,87 @@ body.fixedContentEstudiante.modal-open
     margin-top: 20px;
     width: 100%;
     display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.menu_inicio .contenedor_principal {
+    width: 100%;
+    max-width: 800px;
+    aspect-ratio: 210 / 297; /* movil */
     border-radius: 10px;
-    overflow: hidden;
     box-shadow: 1px 8px 10px rgba(0, 0, 0, 0.4);
+    position: relative;
 }
-.portada {
-    width: 50%;
+
+.contenedor_producto .producto {
+    width: 100%;
     overflow: hidden;
 }
-.portada img {
+
+.contenedor_producto_imp .producto {
+    width: 210mm;
+    height: 297mm;
+    overflow: hidden;
+}
+
+.contenedor_producto .producto img,
+.contenedor_producto_imp .producto img {
     width: 100%;
     height: 100%;
-    width: 100%;
     object-fit: fill;
 }
 
-.contenedor_producto {
-    min-width: 100%;
+.contenedor_producto .producto .pagina .nombre,
+.contenedor_producto_imp .producto .pagina .nombre {
+    font-weight: bold;
+    width: 100%;
+    text-align: center;
+}
+
+@media (min-width: 768px) {
+    .menu_inicio .contenedor_principal {
+        aspect-ratio: 1 /1.1;
+    }
+}
+
+@media print {
+    #pdf-container {
+        width: 210mm;
+    }
+
+    #pdf-container .pagina {
+        width: 210mm;
+        height: 297mm;
+        page-break-after: always; /*  salto de página */
+        break-after: page;
+    }
+
+    #pdf-container .pagina:last-child {
+        page-break-after: auto;
+    }
+
+    #pdf-container .producto {
+        max-height: 297mm;
+    }
+    #pdf-container .pagina table {
+        height: 100%;
+    }
+}
+
+.menu_inicio .contenedor_producto {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.menu_inicio .producto.con_animacion {
+    position: absolute;
+    height: 100%;
+    top: 0;
+    left: 0;
+    transition: transform 0.35s ease;
 }
 
 .contenedor_producto .capa {
@@ -337,12 +401,6 @@ body.fixedContentEstudiante.modal-open
 
 .contenedor_producto:active {
     cursor: grabbing;
-}
-
-.menu_inicio .producto {
-    height: 100%;
-    display: block;
-    position: relative;
 }
 
 .producto .capa {
@@ -413,12 +471,12 @@ body.fixedContentEstudiante.modal-open
 }
 
 .menu_inicio .pagina_inicio i {
-    top: 20px;
-    left: -20px;
+    top: -25px;
+    left: 0px;
 }
 .menu_inicio .pagina_ultimo i {
-    top: 20px;
-    right: -20px;
+    top: -25px;
+    right: 0px;
 }
 
 .menu_inicio .pagina_anterior i {
@@ -485,33 +543,12 @@ body.fixedContentEstudiante.modal-open
     color: #8b8b8b;
 }
 
-#pdf-container {
-    width: 210mm;
-}
-
-#pdf-container .pagina {
-    width: 210mm;
-    height: 297mm;
-
-    page-break-after: always; /*  salto de página */
-    break-after: page;
-    display: block;
-}
-
-#pdf-container .pagina:last-child {
-    page-break-after: auto;
-}
-
-#pdf-container .producto {
-    max-height: 297mm;
-}
-#pdf-container .pagina table {
-    height: 100%;
-}
-
 @media (max-width: 867px) {
-    .menu_inicio {
-        /* height: 50vh; */
+    .menu_inicio .pagina_anterior i {
+        display: none;
+    }
+    .menu_inicio .pagina_siguiente i {
+        display: none;
     }
 
     .portada {
@@ -561,9 +598,10 @@ body.fixedContentEstudiante.modal-open
     .menu img {
         object-fit: fill;
     }
+}
 
-    .contenedor_producto {
-        background-color: rgb(235, 235, 235);
-        padding: 10px;
+@media print {
+    .producto {
+        aspect-ratio: 210 / 297; /* tablet */
     }
 }

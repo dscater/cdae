@@ -305,6 +305,12 @@ onMounted(async () => {});
     </div>
 </template>
 <style scoped>
+.pagina {
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+}
 .p9 table {
     border-collapse: separate;
     border-spacing: 5px;
