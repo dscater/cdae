@@ -18,7 +18,7 @@ onBeforeMount(() => {
     setCatalogo(props.catalogo);
     appStore.startLoading();
 });
-const { oCatalogo, setCatalogo, limpiarCatalogo } = useCatalogos();
+const { form, setCatalogo, limpiarCatalogo } = useCatalogos();
 
 onMounted(() => {
     appStore.stopLoading();
@@ -52,7 +52,7 @@ onMounted(() => {
         </template>
         <div class="row">
             <div class="col-md-12">
-                <Formulario :catalogo="oCatalogo"></Formulario>
+                <Formulario :form="form"></Formulario>
             </div>
         </div>
     </Content>

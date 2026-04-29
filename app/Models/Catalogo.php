@@ -20,7 +20,10 @@ class Catalogo extends Model
 
     public function getUrlImagenAttribute()
     {
-        return asset("imgs/catalogos/{$this->imagen}");
+        if ($this->imagen) {
+            return asset("imgs/catalogos/{$this->imagen}");
+        }
+        return "";
     }
 
     public function productos()

@@ -15,336 +15,228 @@ const agregarProducto = (item) => {
 onMounted(async () => {});
 </script>
 <template>
-    <div class="p4 pagina">
-        <table>
-            <tbody>
-                <tr>
-                    <td>
-                        <img :src="productos[0].url_imagen" alt="" />
-                    </td>
-                    <td>
-                        <img :src="productos[1].url_imagen" alt="" />
-                    </td>
-                    <td>
-                        <img :src="productos[2].url_imagen" alt="" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="nombre">{{ productos[0].nombre }}</div>
+    <div class="pagina">
+        <div class="parent">
+            <div class="div1">
+                <img :src="productos[0].url_imagen" alt="" />
+                <div class="contenido">
+                    <div class="nombre">{{ productos[0].nombre }}</div>
+                    <div class="descripcion">
+                        {{ productos[0].producto_descripcions[0].descripcion }}
+                    </div>
+                    <div class="precio">
+                        {{ productos[0].moneda }} {{ productos[0].precio }}
+                    </div>
+                    <div class="accion">
+                        <button @click="agregarProducto(productos[0])">
+                            <span>Agregar</span>
+                            <i class="fa fa-cart-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="div2">
+                <img :src="productos[1].url_imagen" alt="" />
+                <div class="contenido">
+                    <div class="nombre">{{ productos[1].nombre }}</div>
+                    <div class="descripcion">
+                        {{ productos[1].producto_descripcions[0].descripcion }}
+                    </div>
+                    <div class="precio">
+                        {{ productos[1].moneda }} {{ productos[1].precio }}
+                    </div>
+                    <div class="accion">
+                        <button @click="agregarProducto(productos[1])">
+                            <span>Agregar</span>
+                            <i class="fa fa-cart-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="div3">
+                <img :src="productos[2].url_imagen" alt="" />
+                <div class="contenido">
+                    <div class="nombre">{{ productos[2].nombre }}</div>
+                    <div class="descripcion">
+                        {{ productos[2].producto_descripcions[0].descripcion }}
+                    </div>
+                    <div class="precio">
+                        {{ productos[2].moneda }} {{ productos[2].precio }}
+                    </div>
+                    <div class="accion">
+                        <button @click="agregarProducto(productos[2])">
+                            <span>Agregar</span>
+                            <i class="fa fa-cart-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="div4">
+                <img :src="productos[3].url_imagen" alt="" />
+                <div class="contenido">
+                    <div class="nombre">{{ productos[3].nombre }}</div>
+                    <div class="descripcion">
+                        {{ productos[3].producto_descripcions[0].descripcion }}
+                    </div>
+                    <div class="precio">
+                        {{ productos[3].moneda }} {{ productos[3].precio }}
+                    </div>
+                    <div class="accion">
+                        <button @click="agregarProducto(productos[3])">
+                            <span>Agregar</span>
+                            <i class="fa fa-cart-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="div5">
+                <img :src="productos[4].url_imagen" alt="" />
+                <div class="contenido">
+                    <div class="nombre">{{ productos[4].nombre }}</div>
+                    <div class="descripcion">
+                        {{ productos[4].producto_descripcions[0].descripcion }}
+                    </div>
+                    <div class="precio">
+                        {{ productos[4].moneda }} {{ productos[4].precio }}
+                    </div>
+                    <div class="accion">
+                        <button @click="agregarProducto(productos[4])">
+                            <span>Agregar</span>
+                            <i class="fa fa-cart-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="div6">
+                <img :src="productos[5].url_imagen" alt="" />
+                <div class="contenido">
+                    <div class="nombre">{{ productos[5].nombre }}</div>
+                    <div class="descripcion">
+                        {{ productos[5].producto_descripcions[0].descripcion }}
+                    </div>
+                    <div class="precio">
+                        {{ productos[5].moneda }} {{ productos[5].precio }}
+                    </div>
+                    <div class="accion">
+                        <button @click="agregarProducto(productos[5])">
+                            <span>Agregar</span>
+                            <i class="fa fa-cart-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="div7">
+                <img :src="productos[6].url_imagen" alt="" />
+                <div class="contenido">
+                    <div class="parte1">
+                        <div class="nombre">
+                            {{ productos[6].nombre }}
+                        </div>
+                    </div>
+                    <div class="parte2">
                         <div class="descripcion">
                             {{
-                                productos[0].producto_descripcions[0]
+                                productos[6].producto_descripcions[0]
                                     .descripcion
                             }}
                         </div>
                         <div class="precio">
-                            {{ productos[0].moneda }} {{ productos[0].precio }}
+                            {{ productos[6].moneda }}
+                            {{ productos[6].precio }}
                         </div>
                         <div class="accion">
-                            <button @click="agregarProducto(productos[0])">
-                                <i class="fa fa-cart-plus"></i>
+                            <button @click="agregarProducto(productos[6])">
                                 <span>Agregar</span>
+                                <i class="fa fa-cart-plus"></i>
                             </button>
                         </div>
-                    </td>
-                    <td>
-                        <div class="nombre">{{ productos[1].nombre }}</div>
-                        <div class="descripcion">
-                            {{
-                                productos[1].producto_descripcions[0]
-                                    .descripcion
-                            }}
-                        </div>
-                        <div class="precio">
-                            {{ productos[1].moneda }} {{ productos[1].precio }}
-                        </div>
-                        <div class="accion">
-                            <button @click="agregarProducto(productos[1])">
-                                <i class="fa fa-cart-plus"></i>
-                                <span>Agregar</span>
-                            </button>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="nombre">{{ productos[2].nombre }}</div>
-                        <div class="descripcion">
-                            {{
-                                productos[2].producto_descripcions[0]
-                                    .descripcion
-                            }}
-                        </div>
-                        <div class="precio">
-                            {{ productos[2].moneda }} {{ productos[2].precio }}
-                        </div>
-                        <div class="accion">
-                            <button @click="agregarProducto(productos[2])">
-                                <i class="fa fa-cart-plus"></i>
-                                <span>Agregar</span>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <img :src="productos[3].url_imagen" alt="" />
-                    </td>
-                    <td>
-                        <img :src="productos[4].url_imagen" alt="" />
-                    </td>
-                    <td>
-                        <img :src="productos[5].url_imagen" alt="" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="nombre">{{ productos[3].nombre }}</div>
-                        <div class="descripcion">
-                            {{
-                                productos[3].producto_descripcions[0]
-                                    .descripcion
-                            }}
-                        </div>
-                        <div class="precio">
-                            {{ productos[3].moneda }} {{ productos[3].precio }}
-                        </div>
-                        <div class="accion">
-                            <button @click="agregarProducto(productos[3])">
-                                <i class="fa fa-cart-plus"></i>
-                                <span>Agregar</span>
-                            </button>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="nombre">{{ productos[4].nombre }}</div>
-                        <div class="descripcion">
-                            {{
-                                productos[4].producto_descripcions[0]
-                                    .descripcion
-                            }}
-                        </div>
-                        <div class="precio">
-                            {{ productos[4].moneda }} {{ productos[4].precio }}
-                        </div>
-                        <div class="accion">
-                            <button @click="agregarProducto(productos[4])">
-                                <i class="fa fa-cart-plus"></i>
-                                <span>Agregar</span>
-                            </button>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="nombre">{{ productos[5].nombre }}</div>
-                        <div class="descripcion">
-                            {{
-                                productos[5].producto_descripcions[0]
-                                    .descripcion
-                            }}
-                        </div>
-                        <div class="precio">
-                            {{ productos[5].moneda }} {{ productos[5].precio }}
-                        </div>
-                        <div class="accion">
-                            <button @click="agregarProducto(productos[5])">
-                                <i class="fa fa-cart-plus"></i>
-                                <span>Agregar</span>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="3">
-                        <div
-                            class="contenido"
-                            :style="{
-                                backgroundImage: `url(${
-                                    productos[4].url_imagen
-                                })`,
-                                backgroundSize: '100% 100%',
-                                backgroundRepeat: 'no-repeat',
-                                backgroundPosition: 'center',
-                            }"
-                        >
-                            <div class="nombre">
-                                {{ productos[4].nombre }}
-                            </div>
-                            <div class="descripcion">
-                                {{
-                                    productos[4].producto_descripcions[0]
-                                        .descripcion
-                                }}
-                            </div>
-                            <div class="precio">
-                                {{ productos[4].moneda }}
-                                {{ productos[4].precio }}
-                            </div>
-                            <div class="accion">
-                                <button @click="agregarProducto(productos[4])">
-                                    <i class="fa fa-cart-plus"></i>
-                                    <span>Agregar</span>
-                                </button>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 <style scoped>
-.p4 table {
-    border-collapse: separate;
-    border-spacing: 5px;
+.pagina {
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.parent {
     width: 100%;
     height: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: 41% 41% 18%;
+    gap: 0px 7px;
 }
 
-.p4 table tbody tr td div.accion {
-    width: 100%;
-    text-align: center;
+.parent > div {
+    padding: 5px 0px;
+    box-sizing: border-box;
 }
 
-.p4 table tbody tr td {
-    padding: 0;
+.parent > .div1,
+.parent > .div4 {
+    padding-left: 20px;
+}
+
+.parent > .div3,
+.parent > .div6 {
+    padding-right: 20px;
+}
+
+.div1 img,
+.div2 img,
+.div3 img,
+.div4 img,
+.div5 img,
+.div6 img {
+    height: 63%;
+}
+
+.div7 {
+    grid-column: span 3 / span 3;
+    padding: 10px 0px 0px 0px !important;
     position: relative;
+    max-height: 100%;
 }
 
-.p4 table tbody tr td div.accion button {
-    font-size: 13pt;
-    border: solid 1px var(--principal);
-    border-radius: 20px;
-    padding: 10px;
-}
-
-.p4 div.accion button span {
-    font-size: 10pt;
-    margin-left: 7px;
-}
-
-.p4 table tbody tr td div.nombre {
-    width: 100%;
-    text-align: center;
-    font-weight: bold;
-    font-size: 15pt;
-}
-
-.p4 table tbody tr td div.descripcion {
-    width: 100%;
-    text-align: center;
-    font-weight: normal;
-    font-size: 12pt;
-    min-height: 80px;
-}
-
-.p4 table tbody tr td div.precio {
-    width: 100%;
-    text-align: center;
-    font-weight: bold;
-    font-size: 12pt;
-    margin-top: 40px;
-    min-height: 40px;
-}
-
-.p4 table tbody img {
-    width: 100%;
-    height: 100%;
-    object-fit: fill;
-}
-
-/* FILA 1 */
-.p4 table tbody tr:nth-child(1) td:nth-child(1),
-.p4 table tbody tr:nth-child(1) td:nth-child(2),
-.p4 table tbody tr:nth-child(1) td:nth-child(3) {
-    width: 181px;
-    min-height: 180px;
-    height: 200px;
-}
-
-/* FILA 2 */
-.p4 table tbody tr:nth-child(2) div.nombre {
-    font-weight: bold;
-    font-size: 15pt;
-}
-
-.p4 table tbody tr:nth-child(2) div.descripcion {
-    font-weight: normal;
-    font-size: 12pt;
-    min-height: auto;
-    height: auto;
-}
-
-.p4 table tbody tr:nth-child(2) div.precio {
-    font-weight: bold;
-    font-size: 12pt;
-    margin: 0;
-}
-
-/* FILA 3 */
-.p4 table tbody tr:nth-child(3) td:nth-child(1),
-.p4 table tbody tr:nth-child(3) td:nth-child(2),
-.p4 table tbody tr:nth-child(3) td:nth-child(3) {
-    width: 181px;
-    min-height: 180px;
-    height: 200px;
-}
-
-/* FILA 4 */
-.p4 table tbody tr:nth-child(4) div.nombre {
-    font-weight: bold;
-    font-size: 15pt;
-}
-
-.p4 table tbody tr:nth-child(4) div.descripcion {
-    font-weight: normal;
-    font-size: 12pt;
-    min-height: auto;
-    height: auto;
-}
-
-.p4 table tbody tr:nth-child(4) div.precio {
-    font-weight: bold;
-    font-size: 12pt;
-    margin: 0;
-}
-
-/* FILA 5 */
-.p4 table tbody tr:nth-child(5) td .contenido {
-    position: relative;
-    width: 100%;
-    height: 245px;
-}
-
-.p4 table tbody tr:nth-child(5) td .contenido .nombre,
-.p4 table tbody tr:nth-child(5) td .contenido .precio,
-.p4 table tbody tr:nth-child(5) td .contenido .accion,
-.p4 table tbody tr:nth-child(5) td .contenido .descripcion {
+.div7 .contenido {
     position: absolute;
-    right: 20px;
-    width: auto;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 40% !important;
+    grid-template-rows: 1fr auto !important;
 }
 
-.p4 table tbody tr:nth-child(5) td .contenido .nombre {
-    width: auto;
-    left: 40px;
+.div7 .contenido .parte1 {
+    height: 100%;
+    display: flex;
+    align-items: end;
+    grid-column: 1;
+    grid-row: 2;
+    padding-left: 20px;
+}
+
+.div7 .contenido .parte1 .nombre {
+    background-color: rgba(255, 255, 255, 0.5);
+    font-size: 1.3rem;
     text-align: left;
-    bottom: 40px;
 }
 
-.p4 table tbody tr:nth-child(5) td .contenido .descripcion {
-    top: 20%;
-}
-
-.p4 table tbody tr:nth-child(5) td .contenido .precio {
-    top: 40%;
-}
-
-.p4 table tbody tr:nth-child(5) td .contenido .accion {
-    bottom: 10px;
-}
-
-@media (max-width: 990px) {
-    button span {
-        display: none;
-    }
+.div7 .contenido .parte2 {
+    grid-column: 2;
+    grid-row: 1/3;
+    background-color: rgba(255, 255, 255, 0.5);
+    padding-top: 20px;
+    padding-bottom: 20px;
+    height: 100%;
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr;
 }
 </style>

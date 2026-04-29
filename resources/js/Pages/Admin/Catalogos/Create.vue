@@ -11,7 +11,7 @@ const appStore = useAppStore();
 onBeforeMount(() => {
     appStore.startLoading();
 });
-const { oCatalogo, setCatalogo, limpiarCatalogo } = useCatalogos();
+const { form, setCatalogo, limpiarCatalogo } = useCatalogos();
 
 onMounted(() => {
     limpiarCatalogo();
@@ -46,7 +46,7 @@ onMounted(() => {
         </template>
         <div class="row">
             <div class="col-md-12">
-                <Formulario :catalogo="oCatalogo"></Formulario>
+                <Formulario :form="form"></Formulario>
             </div>
         </div>
     </Content>

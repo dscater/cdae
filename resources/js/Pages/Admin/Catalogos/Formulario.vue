@@ -17,21 +17,12 @@ import { Toast } from "bootstrap";
 const { oPaginaCatalogo, setPaginaCatalogo, limpiarPaginaCatalogo } =
     usePaginaCatalogos();
 const props = defineProps({
-    catalogo: {
+    form: {
         type: Object,
-        default: {
-            id: 0,
-        },
     },
 });
 
-let form = useForm(props.catalogo);
-watch(
-    () => props.catalogo,
-    (newValue) => {
-        form = useForm(newValue);
-    },
-);
+const form = props.form;
 
 const enviando = ref(false);
 const textBtn = computed(() => {
@@ -114,11 +105,14 @@ const cargarArchivoProducto = (e, index) => {
     }
 };
 
+const old_url_imagen = ref(form.url_imagen ?? "");
 const cargarArchivoFondo = (e, key) => {
     form[key] = null;
     const file = e.target.files[0];
+    form.url_imagen = old_url_imagen.value;
     if (file) {
         form[key] = file;
+        form.url_imagen = URL.createObjectURL(file);
     }
 };
 
@@ -305,11 +299,11 @@ onMounted(() => {});
                                     "
                                 />
                             </div>
-                            <div class="col-md-12 mt-2">
+                            <div class="col-md-3 mt-2">
                                 <label class="">Imagen de Fondo</label>
                                 <button
                                     class="btn btn-sm text-xs btn-danger mx-2"
-                                    v-if="form.imagen"
+                                    v-if="form.url_imagen"
                                     @click.prevent="eliminarFondo"
                                 >
                                     <i class="fa fa-trash"></i>
@@ -336,6 +330,13 @@ onMounted(() => {});
                                         {{ form.errors?.imagen }}
                                     </li>
                                 </ul>
+                            </div>
+                            <div class="col-md-3" v-if="form.url_imagen">
+                                <img
+                                    :src="form.url_imagen"
+                                    alt=""
+                                    width="200px"
+                                />
                             </div>
                         </div>
                     </div>
@@ -415,7 +416,7 @@ onMounted(() => {});
             <div class="col-12">
                 <ul
                     v-if="form.errors?.productos"
-                    class="d-block text-danger list-unstyled"
+                    class="d-block list-unstyled alert alert-danger"
                 >
                     <li class="parsley-required">
                         {{ form.errors?.productos }}

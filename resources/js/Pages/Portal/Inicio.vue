@@ -345,7 +345,7 @@ onUnmounted(() => handleEnd());
                         </div>
                     </div>
                 </div>
-                <div id="pdf-container">
+                <div id="pdf-container" style="display: none">
                     <div class="contenedor_producto_imp">
                         <template v-for="catalogo in listCatalogos">
                             <div

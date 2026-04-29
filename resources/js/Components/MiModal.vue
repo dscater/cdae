@@ -1,5 +1,5 @@
 <script setup>
-import { watch, defineEmits, ref, onMounted, onBeforeUnmount } from "vue";
+import { watch, ref, onMounted, onBeforeUnmount } from "vue";
 const props = defineProps({
     open_modal: {
         type: Boolean,
@@ -33,6 +33,10 @@ const props = defineProps({
         type: String,
         default: "auto",
     },
+    footer: {
+        type: Boolean,
+        default: true,
+    },
 });
 const emits = defineEmits(["close"]);
 const show = ref(props.open_modal);
@@ -51,7 +55,7 @@ watch(
                 .classList.remove("modal-open");
             window.removeEventListener("keyup", handleKeyup);
         }
-    }
+    },
 );
 
 const miModal = ref(null);
@@ -126,7 +130,7 @@ onBeforeUnmount(() => {
                 >
                     <slot name="body"></slot>
                 </div>
-                <div class="modal-footer" :class="[footerClass]">
+                <div v-if="footer" class="modal-footer" :class="[footerClass]">
                     <slot name="footer"></slot>
                 </div>
             </div>

@@ -53,7 +53,7 @@ const textBtn = computed(() => {
     if (enviando.value) {
         return `<i class="fa fa-spin fa-spinner"></i> Enviando...`;
     }
-    return `<i class="fa fa-plus"></i> Agregar`;
+    return `<i class="fa fa-cart-plus"></i> Agregar`;
 });
 
 const enviarFormulario = () => {
@@ -94,86 +94,104 @@ onMounted(() => {});
     <MiModal
         :open_modal="muestra_form"
         @close="cerrarFormulario"
-        :size="''"
-        :header-class="'bg-principal'"
+        :size="'modal_agregar'"
+        :footer="false"
+        :close-esc="true"
+        :header-class="'header_agregar p-0 d-flex justify-content-end'"
         :footer-class="'justify-content-end'"
+        :body-class="'p-0 rounded position-relative'"
     >
         <template #header>
-            <h4 class="modal-title text-white" v-html="tituloDialog"></h4>
             <button
                 type="button"
-                class="close"
+                class="btnCerrar btn btn-default btn-sm"
                 @click.prevent="cerrarFormulario()"
             >
-                <span aria-hidden="true">×</span>
+                <i class="fa fa-times"></i>
             </button>
         </template>
-
         <template #body>
-            <form @submit.prevent="enviarFormulario()" v-if="oProducto">
-                <div class="row">
-                    <div class="col-12">
-                        <img :src="oProducto.url_imagen" alt="" class="w-100" />
-                    </div>
-                    <div class="col-12">
-                        <h4
-                            class="card-title font-weight-bold text-center w-100"
-                        >
-                            {{ oProducto.nombre }}
-                        </h4>
-                    </div>
-                    <div class="col-12">
-                        <h4
-                            class="card-title font-weight-bold text-center w-100"
-                        >
-                            {{ oProducto.moneda }} {{ oProducto.precio }}
-                        </h4>
-                    </div>
-                    <div class="col-md-12 mt-2">
-                        <label>Cantidad</label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <button
-                                    class="btn btn-default"
-                                    @click.prevent="disminuir"
-                                >
-                                    -
-                                </button>
-                            </div>
-                            <input
-                                type="number"
-                                step="1"
-                                class="form-control text-center"
-                                v-model="oAgregar.cantidad"
-                            />
-                            <div class="input-group-append">
-                                <button
-                                    class="btn btn-default"
-                                    @click.prevent="aumentar"
-                                >
-                                    +
-                                </button>
+            <div class="imagen_agregar">
+                <img
+                    :src="oProducto.url_imagen"
+                    alt=""
+                    class="imagenAgregar"
+                    v-if="oProducto"
+                />
+            </div>
+
+            <div class="container-fluid px-4">
+                <form @submit.prevent="enviarFormulario()" v-if="oProducto">
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h4 class="h4 font-weight-bold mt-2">
+                                {{ oProducto.nombre }}
+                            </h4>
+                        </div>
+                        <div class="col-12">
+                            <h4 class="h3 font-weight-bold w-100">
+                                {{ oProducto.moneda }} {{ oProducto.precio }}
+                            </h4>
+                        </div>
+                        <div class="col-md-7 mt-2">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <button
+                                        class="btn btn-default"
+                                        @click.prevent="disminuir"
+                                    >
+                                        -
+                                    </button>
+                                </div>
+                                <input
+                                    type="number"
+                                    step="1"
+                                    class="form-control text-center"
+                                    v-model="oAgregar.cantidad"
+                                />
+                                <div class="input-group-append">
+                                    <button
+                                        class="btn btn-default"
+                                        @click.prevent="aumentar"
+                                    >
+                                        +
+                                    </button>
+                                </div>
                             </div>
                         </div>
+                        <div class="col-md-5 mt-2">
+                            <button
+                                type="button"
+                                class="btn btn-primary w-100"
+                                :disabled="enviando"
+                                @click.prevent="enviarFormulario"
+                                v-html="textBtn"
+                            ></button>
+                        </div>
                     </div>
-                </div>
-            </form>
-        </template>
-        <template #footer>
-            <button
-                type="button"
-                class="btn btn-default"
-                @click.prevent="cerrarFormulario()"
-            >
-                Cerrar
-            </button>
-            <button
-                type="button"
-                class="btn btn-success"
-                :disabled="enviando"
-                @click.prevent="enviarFormulario"
-                v-html="textBtn"
-            ></button>
+                </form>
+            </div>
         </template>
     </MiModal>
 </template>
+<style scoped>
+.btnCerrar {
+    position: relative;
+    right: -10px;
+    top: 10px;
+    z-index: 10;
+}
+
+.imagen_agregar {
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+}
+
+.imagen_agregar img {
+    border-radius: 10px;
+    height: 350px;
+    width: 100%;
+    object-fit: fill;
+}
+</style>

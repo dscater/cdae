@@ -33,3 +33,18 @@ table .bg-dark-principal,
 .text-white {
     color: white !important;
 }
+
+#app .modal-dialog.modal_agregar .modal-content {
+    background-color: transparent;
+    box-shadow: none;
+    border: none;
+}
+
+.modal_agregar .modal-body {
+    background-color: white;
+}
+
+.header_agregar {
+    background: transparent !important;
+    border-bottom: none;
+}

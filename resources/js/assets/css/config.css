@@ -317,10 +317,16 @@ body.fixedContentEstudiante.modal-open
 .menu_inicio .contenedor_principal {
     width: 100%;
     max-width: 800px;
-    aspect-ratio: 210 / 297; /* movil */
+    aspect-ratio: 210 / 320; /* movil */
     border-radius: 10px;
     box-shadow: 1px 8px 10px rgba(0, 0, 0, 0.4);
     position: relative;
+}
+
+.contenedor_producto_imp .producto,
+.contenedor_producto_imp .producto div,
+.contenedor_producto .producto {
+    font-family: "Myriad Variable Concept";
 }
 
 .contenedor_producto .producto {
@@ -345,12 +351,84 @@ body.fixedContentEstudiante.modal-open
 .contenedor_producto_imp .producto .pagina .nombre {
     font-weight: bold;
     width: 100%;
+    font-size: 1.1rem;
+}
+
+.contenedor_producto .producto .pagina button,
+.contenedor_producto_imp .producto .pagina button {
+    display: flex;
+    width: 85%;
+    margin: auto;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-radius: 15px;
+    border: none;
+    background-color: #e2e2e2;
+    padding: 4px 0px;
+    transition: all 0.3s;
+}
+
+.contenedor_producto .producto .pagina button:hover,
+.contenedor_producto_imp .producto .pagina button:hover {
+    transform: translateY(-2px);
+}
+.contenedor_producto .producto .pagina .descripcion,
+.contenedor_producto_imp .producto .pagina .descripcion,
+.contenedor_producto .producto .pagina .descripcion2,
+.contenedor_producto_imp .producto .pagina .descripcion2,
+.contenedor_producto .producto .pagina .descripcion3,
+.contenedor_producto_imp .producto .pagina .descripcion3 {
+    font-size: 0.9rem;
+    font-weight: 400;
+}
+
+.contenedor_producto .producto .pagina .precio,
+.contenedor_producto_imp .producto .pagina .precio {
+    font-weight: bold;
+    font-size: 1.3rem;
+}
+
+@media (max-width: 900px) {
+    .contenedor_producto .producto .pagina .nombre {
+        font-size: 0.8rem !important;
+    }
+    .contenedor_producto .producto .pagina .descripcion,
+    .contenedor_producto .producto .pagina .descripcion2,
+    .contenedor_producto .producto .pagina .descripcion3 {
+        font-size: 0.7rem !important;
+        margin-bottom: 0 !important;
+    }
+    .contenedor_producto .producto .pagina .precio {
+        font-size: 0.8rem !important;
+    }
+
+    .contenedor_producto .producto .pagina button {
+        width: 50px;
+        font-size: 0.8rem;
+    }
+
+    .contenedor_producto .producto .pagina button span {
+        display: none;
+    }
+}
+
+.contenedor_producto .producto .pagina div .contenido,
+.contenedor_producto_imp .producto .pagina div .contenido {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(4, auto);
+    align-items: center;
+}
+
+.contenedor_producto .producto .pagina div .contenido div,
+.contenedor_producto_imp .producto .pagina div .contenido div {
     text-align: center;
 }
 
 @media (min-width: 768px) {
     .menu_inicio .contenedor_principal {
-        aspect-ratio: 1 /1.1;
+        aspect-ratio: 1 /1.17;
     }
 }
 

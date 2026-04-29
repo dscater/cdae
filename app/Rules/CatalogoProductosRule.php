@@ -37,8 +37,12 @@ class CatalogoProductosRule implements ValidationRule
             if (trim('' . $item["nombre"]) == '') {
                 $fail("No se ingreso el nombre del producto " . ($key + 1));
             }
-            if (trim('' . $item["moneda"]) == '' || (float)$item["moneda"] < 0) {
+            if (trim('' . $item["moneda"]) == '') {
                 $fail("No se ingreso el texto de precio del producto " . ($key + 1));
+            } else {
+                if (!preg_match('/^[\p{L}\s\.\'"]+$/u', $item["moneda"])) {
+                    $fail("El campo moneda del producto " . ($key + 1) . " solo debe contener texto válido (sin números).");
+                }
             }
             if (trim('' . $item["precio"]) == '' || (float)$item["precio"] < 0) {
                 $fail("No se ingreso el precio del producto " . ($key + 1));
